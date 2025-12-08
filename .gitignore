@@ -1,0 +1,22 @@
+# Environnement virtuel
+.venv/
+env/
+venv/
+
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Outils
+.idea/
+.vscode/
+*.log
+
+# Docker
+*.pid
+
+# OS
+.DS_Store
+Thumbs.db
