@@ -4,6 +4,7 @@ import { Auth } from '../auth';
 import { Router } from '@angular/router';
 
 
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
@@ -14,6 +15,7 @@ import { Router } from '@angular/router';
 
 export class Login {
 
+loading = false;
 
   form;
 
@@ -30,19 +32,28 @@ export class Login {
   onSubmit() {
     if (this.form.invalid) return;
     const { email, password } = this.form.value;
+    const normalizedEmail = email?.trim().toLowerCase();
+    if (!normalizedEmail || !password) return;
+    
+    this.loading = true;
 
-    this.auth.login(email!, password!).subscribe({
+    this.auth.login(normalizedEmail, password!).subscribe({
       next: () => {
         this.auth.me().subscribe({
           next: (me: any) => {
-          if (me.role === 'ADMIN') this.router.navigate(['/admin']);
-          if (me.role === 'PREFET') this.router.navigate(['/prefet']);
-          if (me.role === 'CHEF_OUVRIER') this.router.navigate(['/chef_ouvrier']);
-          if (me.role === 'OUVRIER') this.router.navigate(['/ouvrier']);
+          this.loading = false;
+          this.router.navigate(['dashboard']);
+          },
+          error: (err) => {
+            this.loading = false;
+            console.log('Erreur /me', err?.error ?? err);
           },
         });
       },
-      error: (err) => console.error('Erreur login:', err),
+      error: (err) => {
+            this.loading = false;
+            console.log('Erreur loggin', err?.error ?? err);
+      },
     });
   }
 }

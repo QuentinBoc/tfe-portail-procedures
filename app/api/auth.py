@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.models.user import get_user_by_email
+from sqlalchemy import func
+from app.models.user import User, get_user_by_email
 from app.core.security import verify_password
 from app.core.db import get_db
 from app.api.shemas import LoginRequest
@@ -10,11 +11,15 @@ from app.core.security import create_token, verify_password, get_current_user
 router = APIRouter()
 
 @router.get("/me")
-async def get_me(current_user = Depends(get_current_user)):
+def get_me(current_user: User = Depends(get_current_user)):
+    role = current_user.role_details
     return {
         "id": current_user.id,
         "email": current_user.email,
-        "role": current_user.role,
+        "full_name": current_user.full_name,
+        "role": role.name if role else None,
+        "role_label": role.label if role else None,
+        "role_id": current_user.role_id,
     }
 
 
@@ -30,7 +35,8 @@ async def debug_user(email: str, db: Session = Depends(get_db)):
 @router.post("/login")
 async def login(data: LoginRequest, db: Session = Depends(get_db)):
 
-    user = get_user_by_email(db, data.email)
+    email = data.email.strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == email).first()
 
     if user is None:
         raise HTTPException(status_code=400, detail="Aucun utilisateur trouvé")

@@ -1,5 +1,28 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <input type="email" formControlName="email" placeholder="Email">
-  <input type="password" formControlName="password" placeholder="Mot de passe">
-  <button type="submit">Se connecter</button>
-</form>
+<div class="min-h-screen flex items-center justify-center login-bg">
+  <div class="app-card w-full max-w-md">
+    <h1 class="text-2xl font-semibold mb-2">Connexion</h1>
+    <p class="text-sm text-[var(--muted)] mb-6">
+      Accès au portail interne
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Email"
+        class="app-input"
+      />
+
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="Mot de passe"
+        class="app-input"
+      />
+
+      <button type="submit" class="app-btn-primary" [disabled]="loading">
+        {{ loading ? 'Connexion...' : 'Se connecter'}}
+      </button>
+    </form>
+  </div>
+</div>

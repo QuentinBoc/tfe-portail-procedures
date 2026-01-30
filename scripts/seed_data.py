@@ -1,4 +1,4 @@
-from sqlite3 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 import sys
 from pathlib import Path
 
@@ -8,8 +8,15 @@ sys.path.append(str(BASE_DIR))
 
 from app.core.db import SessionLocal
 from app.models.user import User, get_user_by_email
+from app.models.role import Role
 from passlib.hash import pbkdf2_sha256
 
+
+def get_role_id(db, role_name: str) -> int:
+    role = db.query(Role).filter(Role.name == role_name).first()
+    if not role:
+        raise RuntimeError(f"Role '{role_name}' introuvable dans la table roles")
+    return role.id
 
 def create_admin():
     db = SessionLocal()
@@ -24,7 +31,7 @@ def create_admin():
         email="admin@admin.com",
         full_name="Administrateur",
         password_hash=pbkdf2_sha256.hash("admin"),  # mot de passe: admin
-        role="ADMIN",
+        role_id=get_role_id(db, "ADMIN"),
     )
 
     db.add(admin)
@@ -53,7 +60,7 @@ def create_prefet():
         email="prefet@prefet.com",
         full_name="Prefet",
         password_hash=pbkdf2_sha256.hash("prefet"), 
-        role="PREFET",
+        role_id=get_role_id(db, "PREFET"),
     )
 
     db.add(prefet)
@@ -82,7 +89,7 @@ def create_chef_ouvrier():
         email="chef_ouvrier@chef_ouvrier.com",
         full_name="Chef_ouvrier",
         password_hash=pbkdf2_sha256.hash("chef_ouvrier"), 
-        role="CHEF_OUVRIER",
+        role_id=get_role_id(db, "CHEF_OUVRIER"),
     )
 
     db.add(chef_ouvrier)
@@ -108,7 +115,7 @@ def create_ouvrier():
         email="ouvrier@ouvrier.com",
         full_name="Ouvrier",
         password_hash=pbkdf2_sha256.hash("ouvrier"),
-        role="OUVRIER",
+        role_id=get_role_id(db, "OUVRIER"),
     )
 
     db.add(ouvrier)
