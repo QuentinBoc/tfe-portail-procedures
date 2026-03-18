@@ -11,15 +11,11 @@ class Intervention(Base):
 
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    type = Column(String, nullable=False)
     location = Column(String, nullable=False)
-
     status = Column(String, nullable=False, default="PENDING")
-
-    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    validated_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    assigned_to_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    sent_to_chef_by_id = Column(Integer, nullable=True)
-    sent_to_worker_by_id = Column(Integer, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
+    validated_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    validated_at = Column(DateTime, nullable=True)

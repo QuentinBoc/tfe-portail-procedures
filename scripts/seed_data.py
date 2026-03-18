@@ -1,37 +1,65 @@
-from sqlalchemy.exc import IntegrityError
-import sys
 from pathlib import Path
+import sys
 
-# Ajouter la racine du projet au PYTHONPATH
+# Permet d'exécuter le script depuis /scripts en gardant les imports "app.*"
 BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
+
+from sqlalchemy.exc import IntegrityError
+from passlib.hash import pbkdf2_sha256
+from sqlalchemy.orm import Session
 
 from app.core.db import SessionLocal
 from app.models.user import User, get_user_by_email
 from app.models.role import Role
-from passlib.hash import pbkdf2_sha256
 
 
-def get_role_id(db, role_name: str) -> int:
+ROLES_TO_CREATE = [
+    {"name": "REQUESTER", "label": "Demandeur"},
+    {"name": "TECHNICIAN", "label": "Technicien"},
+    {"name": "SUPERVISOR", "label": "Superviseur"},
+    {"name": "VALIDATOR", "label": "Validateur"},
+    {"name": "ADMIN", "label": "Administrateur"},
+]
+
+ROLE_LABEL_BY_NAME = {r["name"]: r["label"] for r in ROLES_TO_CREATE}
+
+
+def init_roles(db: Session) -> None:
+    """Crée les rôles génériques si absents (idempotent)."""
+    for role_data in ROLES_TO_CREATE:
+        existing = db.query(Role).filter(Role.name == role_data["name"]).first()
+        if not existing:
+            db.add(Role(name=role_data["name"], label=role_data["label"]))
+    db.commit()
+
+
+def get_or_create_role_id(db: Session, role_name: str) -> int:
+    """Retourne l'id du rôle; le crée si absent."""
     role = db.query(Role).filter(Role.name == role_name).first()
-    if not role:
-        raise RuntimeError(f"Role '{role_name}' introuvable dans la table roles")
+    if role:
+        return role.id
+
+    label = ROLE_LABEL_BY_NAME.get(role_name, role_name)
+    role = Role(name=role_name, label=label)
+    db.add(role)
+    db.commit()
+    db.refresh(role)
     return role.id
 
-def create_admin():
-    db = SessionLocal()
 
+def create_admin(db: Session) -> None:
+    """Crée l'admin si absent (idempotent)."""
     existing = get_user_by_email(db, "admin@admin.com")
     if existing:
         print("Admin existe déjà, aucun changement.")
-        db.close()
         return
-    
+
     admin = User(
         email="admin@admin.com",
         full_name="Administrateur",
-        password_hash=pbkdf2_sha256.hash("admin"),  # mot de passe: admin
-        role_id=get_role_id(db, "ADMIN"),
+        password_hash=pbkdf2_sha256.hash("admin"),
+        role_id=get_or_create_role_id(db, "ADMIN"),
     )
 
     db.add(admin)
@@ -41,98 +69,16 @@ def create_admin():
     except IntegrityError:
         db.rollback()
         print("Conflit d'unicité : admin existe déjà.")
-    finally:
-        db.close()
 
 
-
-
-def create_prefet():
+def main():
     db = SessionLocal()
-
-    existing = get_user_by_email(db, "prefet@prefet.com")
-    if existing:
-        print("Prefet existe déjà, aucun changement.")
-        db.close()
-        return
-    
-    prefet = User(
-        email="prefet@prefet.com",
-        full_name="Prefet",
-        password_hash=pbkdf2_sha256.hash("prefet"), 
-        role_id=get_role_id(db, "PREFET"),
-    )
-
-    db.add(prefet)
     try:
-        db.commit()
-        print("Prefet créé : prefet@prefet.com / mot de passe : prefet")
-    except IntegrityError:
-        db.rollback()
-        print("Conflit d'unicité : prefet existe déjà.")
+        init_roles(db)
+        create_admin(db)
     finally:
         db.close()
-
-
-
-
-def create_chef_ouvrier():
-    db = SessionLocal()
-
-    existing = get_user_by_email(db, "chef_ouvrier@chef_ouvrier.com")
-    if existing:
-        print("Chef_ouvrier existe déjà, aucun changement.")
-        db.close()
-        return
-    
-    chef_ouvrier = User(
-        email="chef_ouvrier@chef_ouvrier.com",
-        full_name="Chef_ouvrier",
-        password_hash=pbkdf2_sha256.hash("chef_ouvrier"), 
-        role_id=get_role_id(db, "CHEF_OUVRIER"),
-    )
-
-    db.add(chef_ouvrier)
-    try:
-        db.commit()
-        print("Chef_ouvrier créé : chef_ouvrier@chef_ouvrier.com / mot de passe : chef_ouvrier")
-    except IntegrityError:
-        db.rollback()
-        print("Conflit d'unicité : chef_ouvrier existe déjà.")
-    finally:
-        db.close()
-    
-def create_ouvrier():
-    db = SessionLocal()
-
-    existing = get_user_by_email(db, "ouvrier@ouvrier.com")
-    if existing:
-        print("Ouvrier existe déjà, aucun changement.")
-        db.close()
-        return
-    
-    ouvrier = User(
-        email="ouvrier@ouvrier.com",
-        full_name="Ouvrier",
-        password_hash=pbkdf2_sha256.hash("ouvrier"),
-        role_id=get_role_id(db, "OUVRIER"),
-    )
-
-    db.add(ouvrier)
-    try:
-        db.commit()
-        print("Ouvrier créé : ouvrier@ouvrier.com / mot de passe : ouvrier")
-    except IntegrityError:
-        db.rollback()
-        print("Conflit d'unicité : ouvrier existe déjà.")
-    finally:
-        db.close()
-
-
 
 
 if __name__ == "__main__":
-    create_admin()
-    create_chef_ouvrier()
-    create_prefet()
-    create_ouvrier()
+    main()

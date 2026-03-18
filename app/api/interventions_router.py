@@ -1,8 +1,8 @@
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.shemas import InterventionCreate, SendToChefRequest, SendToWorkerRequest, InterventionOut
-from app.core.permissions import require_role
+from app.api.schemas import InterventionCreate, SendToChefRequest, SendToWorkerRequest, InterventionOut
+from app.core.permissions import require_any_role, require_role
 from app.core.security import get_current_user
 from app.core.db import get_db
 from app.models import intervention
@@ -64,7 +64,7 @@ async def add_intervention(
 @router.patch("/{intervention_id}/validate", response_model=InterventionOut)
 def validate_intervention(
     intervention_id: int,
-    current_user: User = Depends(require_role("PREFET")),
+    current_user: User = Depends(require_any_role(["VALIDATOR", "ADMIN"])),
     db: Session = Depends(get_db),
 ):
     intervention = db.query(Intervention).filter(Intervention.id == intervention_id).first()

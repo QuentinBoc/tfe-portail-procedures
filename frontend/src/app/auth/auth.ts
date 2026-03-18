@@ -18,12 +18,12 @@ export class Auth {
     )
     .pipe(
       tap((res) => {
-        localStorage.setItem('token', res.access_token);
+        localStorage.setItem('access_token', res.access_token);
       })
     );
   }
   getToken(): string | null{
-    return localStorage.getItem('token');
+    return localStorage.getItem('access_token');
   }
   me(){
     return this.http.get(`${this.apiURL}/auth/me`);

@@ -14,7 +14,7 @@ sys.path.append(str(BASE_DIR))
 from app.core.db import Base
 from app.models.user import User
 from app.models.intervention import Intervention  # import pour que alembic voit le modèle
-
+from app.models.role import Role
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
