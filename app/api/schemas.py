@@ -11,11 +11,9 @@ class InterventionCreate(BaseModel):
     location: str
     type: str
 
-class SendToChefRequest(BaseModel):
-    chef_id: int
+class AssignRequest(BaseModel):
+    assignee_id: int
 
-class SendToWorkerRequest(BaseModel):
-    worker_id: int
 
 class InterventionOut(BaseModel):
     id: int

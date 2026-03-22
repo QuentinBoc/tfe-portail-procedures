@@ -1,49 +1,16 @@
-from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.schemas import InterventionCreate, SendToChefRequest, SendToWorkerRequest, InterventionOut
-from app.core.permissions import require_any_role, require_role
+from app.api.schemas import InterventionCreate, InterventionOut, AssignRequest
+from app.core.permissions import require_min_level
 from app.core.security import get_current_user
 from app.core.db import get_db
-from app.models import intervention
 from app.models.user import User
 from app.models.intervention import Intervention
 
 router = APIRouter(tags=["interventions"])
 
-@router.get("/mine")
-def get_my_interventions(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)):
-    
-    interventions = (
-        db.query(Intervention)
-        .filter(Intervention.created_by_id == current_user.id)
-        .order_by(Intervention.created_at.desc())
-        .all()
-    )
-    return{
-        "interventions": [
-            {
-                "id": i.id,
-                "title": i.title,
-                "description": i.description,
-                "location": i.location,
-                "status": i.status,
-                "created_by_id": i.created_by_id,
-                "validated_by_id": i.validated_by_id,
-                "assigned_to_id": i.assigned_to_id,
-                "sent_to_chef_by_id": i.sent_to_chef_by_id,
-                "sent_to_worker_by_id": i.sent_to_worker_by_id,
-                "created_at": i.created_at.isoformat() if i.created_at else None,
-                "updated_at": i.updated_at.isoformat() if i.updated_at else None,
-            }
-            for i in interventions
-        ]
-    }
-
-@router.post("")
-async def add_intervention(
+@router.post("", status_code=201, response_model=InterventionOut)
+def add_intervention(
     data: InterventionCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -53,112 +20,117 @@ async def add_intervention(
         title=data.title,
         description=data.description,
         location=data.location,
-        created_by_id=current_user.id)
+        type=data.type,
+        created_by=current_user.id)
     
     db.add(new_intervention)
     db.commit()
     db.refresh(new_intervention)
     return new_intervention
 
+@router.get("/mine", response_model=list[InterventionOut])
+def get_my_interventions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)):
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.created_by == current_user.id)
+        .order_by(Intervention.created_at.desc())
+        .all()
+    )
+    return interventions
 
-@router.patch("/{intervention_id}/validate", response_model=InterventionOut)
+@router.patch("/{id}/validate", response_model=InterventionOut)
 def validate_intervention(
-    intervention_id: int,
-    current_user: User = Depends(require_any_role(["VALIDATOR", "ADMIN"])),
+    id: int,
+    current_user: User = Depends(require_min_level(4)),
     db: Session = Depends(get_db),
 ):
-    intervention = db.query(Intervention).filter(Intervention.id == intervention_id).first()
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
     if intervention.status != "PENDING":
         raise HTTPException(status_code=400, detail="Intervention non validable")
-    intervention.status ="APPROVED"
-    intervention.validated_by_id = current_user.id
+    intervention.status ="VALIDATED"
+    intervention.validated_by = current_user.id
 
     db.commit()
     db.refresh(intervention)
 
     return intervention
 
-
-
-@router.patch("/{intervention_id}/send-to-chef", response_model=InterventionOut)
-def send_to_chef(
-    intervention_id: int,
-    data: SendToChefRequest,
-    current_user: User = Depends(require_role("PREFET")),
-    db: Session = Depends(get_db),
+@router.patch("/{id}/rejected", response_model=InterventionOut)
+def rejected_intervention(
+    id: int,
+    current_user: User = Depends(require_min_level(4)),
+    db: Session =Depends(get_db)
 ):
-    intervention = db.query(Intervention).filter(Intervention.id == intervention_id).first()
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
-    if intervention.status != "APPROVED":
-        raise HTTPException(status_code=400, detail="Vous devez valider l'intervention avant de l'assigner")
-    intervention.status ="SENT_TO_CHEF"
-    intervention.sent_to_chef_by_id = current_user.id
-    intervention.assigned_to_id = data.chef_id
-
+    if intervention.status != "PENDING":
+        raise HTTPException(status_code=400, detail="Seules les interventions en attente peuvent être rejetées")
+    intervention.status ="REJECTED"
+    intervention.validated_by = current_user.id
+    
     db.commit()
     db.refresh(intervention)
-
+    
     return intervention
 
-@router.patch("/{intervention_id}/send-to-worker", response_model=InterventionOut)
-def send_to_worker(
-    intervention_id: int,
-    data: SendToWorkerRequest,
-    current_user: User = Depends(require_role("CHEF_OUVRIER")),
-    db: Session = Depends(get_db),
+@router.patch("/{id}/assign", response_model=InterventionOut)
+def assign_intervention(
+    id: int,
+    data: AssignRequest,
+    current_user: User = Depends(require_min_level(4)),
+    db: Session =Depends(get_db),
 ):
-    intervention = db.query(Intervention).filter(Intervention.id == intervention_id).first()
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
-    if intervention.status != "SENT_TO_CHEF":
-        raise HTTPException(status_code=400, detail="Le chef des ouvriers doit préalablement avoir reçu et validé l'intervention ")
-    intervention.status ="ASSIGNED"
-    intervention.sent_to_worker_by_id = current_user.id
-    intervention.assigned_to_id = data.worker_id
-
+    elif intervention.status == "VALIDATED" and current_user.role_details.level >= 4:
+        intervention.status ="ASSIGNED"
+        intervention.assigned_to = data.assignee_id
+    elif intervention.status == "ASSIGNED" and current_user.role_details.level >= 3:
+        intervention.status ="PROCESSING"
+        intervention.assigned_to = data.assignee_id
+    else:
+        raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
+            
     db.commit()
     db.refresh(intervention)
-
+    
     return intervention
 
-@router.get("/pending-validation", response_model=list[InterventionOut])
-async def pending_validation(
-    current_user: User = Depends(require_role("PREFET")),
-    db: Session = Depends(get_db),
+@router.patch("/{id}/closed", response_model=InterventionOut)
+def closed_intervention(
+    id: int,
+    current_user: User = Depends(require_min_level(2)),
+    db: Session =Depends(get_db)
 ):
-    intervention = (
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
+    if intervention is None:
+        raise HTTPException(status_code=404, detail="Intervention introuvable")
+    if intervention.status != "PROCESSING":
+        raise HTTPException(status_code=400, detail="Seules les interventions en cours peuvent être fermées")
+    intervention.status ="CLOSED"
+    
+    db.commit()
+    db.refresh(intervention)
+    
+    return intervention
+
+@router.get("/pending", response_model=list[InterventionOut],)
+def get_pending_interventions(
+    _current_user: User = Depends(require_min_level(4)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "PENDING")
         .order_by(Intervention.created_at.desc())
         .all()
-    )
-    return intervention
-
-@router.get("/to-assign", response_model=list[InterventionOut])
-async def to_assign_validation(
-    current_user: User = Depends(require_role("CHEF_OUVRIER")),
-    db: Session = Depends(get_db),
-):
-    intervention = (
-        db.query(Intervention)
-        .filter(Intervention.status == "SENT_TO_CHEF")
-        .order_by(Intervention.created_at.desc())
-        .all()
-    )
-    return intervention
-
-@router.get("/assign-to-me", response_model=list[InterventionOut])
-async def assign_to_me_validation(
-    current_user: User = Depends(require_role("OUVRIER")),
-    db: Session = Depends(get_db),
-):
-    intervention = (
-        db.query(Intervention)
-        .filter(Intervention.status == "ASSIGNED",Intervention.assigned_to_id == current_user.id)
-        .order_by(Intervention.created_at.desc())
-        .all()
-    )
-    return intervention
+     )
+    return interventions
