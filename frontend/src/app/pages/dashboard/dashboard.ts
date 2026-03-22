@@ -7,7 +7,7 @@ import { RequesterPanel } from './panels/requester-panel/requester-panel';
 import { Auth } from '../../auth/auth';
 import { CommonModule } from '@angular/common';
 
-type RoleName = 'ADMIN' | 'VALIDATOR' | 'TECHNICIAN' | 'SUPERVISOR' | 'REQUESTER';
+type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,11 +21,11 @@ export class Dashboard implements OnInit {
   ActivePanel: any=null;
   
   panelMap: Record<RoleName, any> = {
-    ADMIN: AdminPanel,
-    VALIDATOR: ValidatorPanel,
-    TECHNICIAN: TechnicianPanel,
-    SUPERVISOR: SupervisorPanel,
-    REQUESTER: RequesterPanel,
+    Admin: AdminPanel,
+    Direction: ValidatorPanel,
+    Technicien: TechnicianPanel,
+    Chef: SupervisorPanel,
+    Utilisateur: RequesterPanel,
   };
 
   constructor(private auth: Auth) {}
