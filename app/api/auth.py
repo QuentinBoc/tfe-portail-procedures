@@ -17,7 +17,7 @@ def get_me(current_user: User = Depends(get_current_user)):
         "id": current_user.id,
         "email": current_user.email,
         "full_name": current_user.full_name,
-        "role": role.name if role else None,
+        "role": role.label if role else None,
         "role_label": role.label if role else None,
         "role_id": current_user.role_id,
     }
