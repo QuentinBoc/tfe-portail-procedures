@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from app.core.security import hash_password
+from app.core.hashing import hash_password
 from app.models.role import Role
 from app.models.user import User
 

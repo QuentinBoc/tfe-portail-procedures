@@ -2,11 +2,11 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.services.user_service import get_user_by_id
-from passlib.hash import pbkdf2_sha256
 from sqlalchemy.orm import Session
 from app.core.config import settings
 import jwt
 from app.core.db import get_db
+
 
 auth_scheme = HTTPBearer()
 
@@ -27,12 +27,6 @@ def verify_token(token: str) -> int | None:
         return None
     except jwt.InvalidTokenError:
         return None
-
-def hash_password(password: str) -> str:
-    return pbkdf2_sha256.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pbkdf2_sha256.verify(plain_password, hashed_password)
 
 
 

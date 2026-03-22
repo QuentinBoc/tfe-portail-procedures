@@ -1,51 +1,58 @@
+
 from pathlib import Path
 import sys
 
+
 # Permet d'exécuter le script depuis /scripts en gardant les imports "app.*"
+
 BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
 
+
+from app.services.user_service import get_user_by_email
+
+
+
 from sqlalchemy.exc import IntegrityError
-from passlib.hash import pbkdf2_sha256
+from app.core.hashing import hash_password
 from sqlalchemy.orm import Session
 
 from app.core.db import SessionLocal
-from app.models.user import User, get_user_by_email
+from app.models.user import User
 from app.models.role import Role
 
 
 ROLES_TO_CREATE = [
-    {"name": "REQUESTER", "label": "Demandeur"},
-    {"name": "TECHNICIAN", "label": "Technicien"},
-    {"name": "SUPERVISOR", "label": "Superviseur"},
-    {"name": "VALIDATOR", "label": "Validateur"},
-    {"name": "ADMIN", "label": "Administrateur"},
+    {"label": "Utilisateur", "level": 1},
+    {"label": "Technicien", "level": 2},
+    {"label": "Chef", "level": 3},
+    {"label": "Direction", "level": 4},
+    {"label": "Admin", "level": 5},
+    
 ]
 
-ROLE_LABEL_BY_NAME = {r["name"]: r["label"] for r in ROLES_TO_CREATE}
+ROLE_LABEL_BY_NAME = {r["label"]: r["level"] for r in ROLES_TO_CREATE}
 
 
 def init_roles(db: Session) -> None:
     """Crée les rôles génériques si absents (idempotent)."""
     for role_data in ROLES_TO_CREATE:
-        existing = db.query(Role).filter(Role.name == role_data["name"]).first()
+        existing = db.query(Role).filter(Role.label == role_data["label"]).first()
         if not existing:
-            db.add(Role(name=role_data["name"], label=role_data["label"]))
+            db.add(Role(label=role_data["label"], level=role_data["level"]))
     db.commit()
 
 
-def get_or_create_role_id(db: Session, role_name: str) -> int:
-    """Retourne l'id du rôle; le crée si absent."""
-    role = db.query(Role).filter(Role.name == role_name).first()
+def get_or_create_role_id(db: Session, role_label: str) -> int:
+    role = db.query(Role).filter(Role.label == role_label).first()
     if role:
         return role.id
-
-    label = ROLE_LABEL_BY_NAME.get(role_name, role_name)
-    role = Role(name=role_name, label=label)
-    db.add(role)
+    level = ROLE_LABEL_BY_NAME.get(role_label)
+    new_role = Role(label=role_label, level=level)
+    db.add(new_role)
     db.commit()
-    db.refresh(role)
-    return role.id
+    db.refresh(new_role)
+    return new_role.id
 
 
 def create_admin(db: Session) -> None:
@@ -58,8 +65,8 @@ def create_admin(db: Session) -> None:
     admin = User(
         email="admin@admin.com",
         full_name="Administrateur",
-        password_hash=pbkdf2_sha256.hash("admin"),
-        role_id=get_or_create_role_id(db, "ADMIN"),
+        password_hash=hash_password("admin"),
+        role_id=get_or_create_role_id(db, "Admin"),
     )
 
     db.add(admin)
