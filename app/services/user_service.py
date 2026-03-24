@@ -18,7 +18,7 @@ def create_user(db: Session, email: str, full_name: str, password: str, role_nam
     if existing:
         raise ValueError("email existe déjà")
     
-    role = db.query(Role).filter(Role.name == role_name).first()
+    role = db.query(Role).filter(Role.label == role_name).first()
     if not role:
         raise ValueError("role inconnu")
     

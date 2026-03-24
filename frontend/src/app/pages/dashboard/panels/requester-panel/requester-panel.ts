@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../interventions';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-requester-panel',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './requester-panel.html',
   styleUrl: './requester-panel.css',
 })

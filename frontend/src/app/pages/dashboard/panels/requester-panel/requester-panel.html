@@ -1,1 +1,19 @@
-<p>requester-panel works!</p>
+<div>
+    <h2>Mes demandes</h2>
+
+    <button>+ Nouvelle demande</button>
+
+    @if (interventions.length === 0){
+        <p>Aucune demande pour le moment.</p>
+    }
+    
+
+    @for (intervention of interventions; track intervention.id){
+       <div>
+            <span>{{ intervention.title }}</span>
+            <span>{{ intervention.status }}</span>
+        </div>
+    }
+</div>
+
+
