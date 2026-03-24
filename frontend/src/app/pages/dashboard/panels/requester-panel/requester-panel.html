@@ -1,19 +1,34 @@
 <div>
     <h2>Mes demandes</h2>
+    <button (click)="openModal()">+ Nouvelle demande</button>
+    @if (showModal) {
+    <div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <input type="text" formControlName="title" placeholder="Titre" />
+            <textarea formControlName="description" placeholder="Description"></textarea>
+            <input type="text" formControlName="location" placeholder="Localisation (ex: Salle 12)" />
+            <select formControlName="type">
+                <option value="TECHNICAL">Personnel de maîtrise</option>
+                <option value="IT">Technicen informatique</option>
+            </select>
+            <button (click)="closeModal()">Annuler</button>
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+    }
 
-    <button>+ Nouvelle demande</button>
+
+
 
     @if (interventions.length === 0){
-        <p>Aucune demande pour le moment.</p>
+    <p>Aucune demande pour le moment.</p>
     }
-    
+
 
     @for (intervention of interventions; track intervention.id){
-       <div>
-            <span>{{ intervention.title }}</span>
-            <span>{{ intervention.status }}</span>
-        </div>
+    <div>
+        <span>{{ intervention.title }}</span>
+        <span>{{ intervention.status }}</span>
+    </div>
     }
 </div>
-
-
