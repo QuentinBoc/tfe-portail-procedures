@@ -16,4 +16,8 @@ export class InterventionService {
   create(data: any) {
     return this.http.post(`${this.apiURL}`, data);
   }
+
+  getAll() {
+    return this.http.get(`${this.apiURL}/all`);
+  }
 }

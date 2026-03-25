@@ -41,6 +41,18 @@ def get_my_interventions(
     )
     return interventions
 
+@router.get("/all", response_model=list[InterventionOut])
+def get_all_interventions(
+    current_user: User = Depends(require_min_level(5)),
+    db: Session = Depends(get_db)):
+    
+    interventions = (
+        db.query(Intervention)
+        .order_by(Intervention.created_at.desc())
+        .all()
+    )
+    return interventions
+
 @router.patch("/{id}/validate", response_model=InterventionOut)
 def validate_intervention(
     id: int,
