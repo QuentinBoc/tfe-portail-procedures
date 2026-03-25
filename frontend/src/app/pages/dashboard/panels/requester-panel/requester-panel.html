@@ -1,34 +1,84 @@
-<div>
-    <h2>Mes demandes</h2>
-    <button (click)="openModal()">+ Nouvelle demande</button>
-    @if (showModal) {
-    <div>
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <input type="text" formControlName="title" placeholder="Titre" />
-            <textarea formControlName="description" placeholder="Description"></textarea>
-            <input type="text" formControlName="location" placeholder="Localisation (ex: Salle 12)" />
-            <select formControlName="type">
-                <option value="TECHNICAL">Personnel de maîtrise</option>
-                <option value="IT">Technicen informatique</option>
+<div class="p-6 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-white">Mes demandes</h2>
+    <button 
+      (click)="openModal()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+      + Nouvelle demande
+    </button>
+  </div>
+
+  <!-- Modal overlay -->
+  @if (showModal) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+        <h3 class="text-xl font-semibold mb-4">Nouvelle demande</h3>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+            <input type="text" formControlName="title"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ex: Panne projecteur" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea formControlName="description"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Décrivez le problème..." rows="3"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Localisation</label>
+            <input type="text" formControlName="location"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ex: Salle 12" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <select formControlName="type"
+              class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="TECHNICAL">Personnel de maîtrise</option>
+              <option value="IT">Technicien informatique</option>
             </select>
-            <button (click)="closeModal()">Annuler</button>
-            <button type="submit">Envoyer</button>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" (click)="closeModal()"
+              class="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+              Annuler
+            </button>
+            <button type="submit"
+              class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+              Envoyer
+            </button>
+          </div>
         </form>
+      </div>
     </div>
-    }
+  }
 
-
-
-
-    @if (interventions.length === 0){
-    <p>Aucune demande pour le moment.</p>
-    }
-
-
-    @for (intervention of interventions; track intervention.id){
-    <div>
-        <span>{{ intervention.title }}</span>
-        <span>{{ intervention.status }}</span>
+  <!-- Liste vide -->
+  @if (interventions.length === 0) {
+    <div class="text-center py-12 text-gray-500">
+      <p class="text-lg">Aucune demande pour le moment.</p>
+      <p class="text-sm mt-1">Cliquez sur "+ Nouvelle demande" pour commencer.</p>
     </div>
+  }
+
+  <!-- Liste des interventions -->
+  <div class="space-y-3">
+    @for (intervention of interventions; track intervention.id) {
+      <div class="bg-white border rounded-xl p-4 shadow-sm flex justify-between items-center">
+        <div>
+          <p class="font-semibold text-gray-800">{{ intervention.title }}</p>
+          <p class="text-sm text-gray-500">{{ intervention.location }}</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-medium"
+          [class]="getStatusClass(intervention.status)">
+          {{ intervention.status }}
+        </span>
+      </div>
     }
+  </div>
+
 </div>
