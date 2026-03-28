@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { InterventionService } from '../../../../interventions';
+import { InterventionService } from '../../../../services/intervention.service';
 import { DatePipe } from '@angular/common';
 
 

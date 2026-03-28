@@ -146,3 +146,17 @@ def get_pending_interventions(
         .all()
      )
     return interventions
+
+@router.get("/validated", response_model=list[InterventionOut],)
+def get_validated_interventions(
+    _current_user: User = Depends(require_min_level(3)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.status == "VALIDATED")
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions

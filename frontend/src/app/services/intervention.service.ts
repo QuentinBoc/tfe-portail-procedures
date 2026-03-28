@@ -6,8 +6,8 @@ import { Injectable } from "@angular/core";
 })
 export class InterventionService {
   private apiURL = 'http://127.0.0.1:8000/api/v1/interventions';
-  
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient) { }
 
   getMine() {
     return this.http.get(`${this.apiURL}/mine`);
@@ -23,13 +23,26 @@ export class InterventionService {
 
   validate(id: number) {
     return this.http.patch(`${this.apiURL}/${id}/validate`, {});
-}
+  }
 
   reject(id: number) {
-      return this.http.patch(`${this.apiURL}/${id}/rejected`, {});
+    return this.http.patch(`${this.apiURL}/${id}/rejected`, {});
+  }
+
+  assign(id: number, assigneeId: number) {
+    return this.http.patch(`${this.apiURL}/${id}/assign`, {assignee_id : assigneeId});
   }
 
   getPending() {
     return this.http.get(`${this.apiURL}/pending`);
-}
+  }
+
+  getValidated() {
+    return this.http.get(`${this.apiURL}/validated`);
+  }
+
+  getAssignableUsers(){
+    
+    return this.http.get(`${this.apiURL}/assignableUsers`);
+  }
 }

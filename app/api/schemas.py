@@ -35,3 +35,9 @@ class UserCreate(BaseModel):
     full_name: str
     password: str
     role_name: str
+    
+class UserOut(BaseModel):
+    full_name: str
+    id: int
+    
+    model_config = ConfigDict(from_attributes=True)

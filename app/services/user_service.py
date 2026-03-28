@@ -38,3 +38,7 @@ def create_user(db: Session, email: str, full_name: str, password: str, role_nam
         raise ValueError("Integrity error")
     return new_user
 
+def get_assignable_users(db: Session, current_level: int) -> list[User]:
+        
+    return db.query(User).join(Role).filter(Role.level < current_level).all()
+
