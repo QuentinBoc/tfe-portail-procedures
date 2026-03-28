@@ -20,4 +20,16 @@ export class InterventionService {
   getAll() {
     return this.http.get(`${this.apiURL}/all`);
   }
+
+  validate(id: number) {
+    return this.http.patch(`${this.apiURL}/${id}/validate`, {});
+}
+
+  reject(id: number) {
+      return this.http.patch(`${this.apiURL}/${id}/rejected`, {});
+  }
+
+  getPending() {
+    return this.http.get(`${this.apiURL}/pending`);
+}
 }

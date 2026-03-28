@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-supervisor-panel',
@@ -6,6 +6,13 @@ import { Component } from '@angular/core';
   templateUrl: './supervisor-panel.html',
   styleUrl: './supervisor-panel.css',
 })
-export class SupervisorPanel {
+export class SupervisorPanel{
 
+  constructor(
+  ) { }
+
+ 
 }
+
+
+
