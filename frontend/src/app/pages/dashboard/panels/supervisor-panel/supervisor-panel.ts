@@ -17,7 +17,7 @@ export class SupervisorPanel implements OnInit {
 
   interventions: any[] = [];
   users: any[] = [];
-  selectedUserId: number | null = null;
+  selectedUserIds: Record<number, number> = {}
 
 
 
@@ -26,8 +26,8 @@ export class SupervisorPanel implements OnInit {
     private userService: UserService
   ) { }
 
-  loadValidatedInterventions(): void {
-    this.interventionService.getValidated().subscribe({
+  getAssigned(): void {
+    this.interventionService.getAssigned().subscribe({
       next: (data: any) => {
         this.interventions = data;
       },
@@ -50,18 +50,19 @@ export class SupervisorPanel implements OnInit {
   }
   
   assign(interventionId: number): void {
-    if (!this.selectedUserId) return;
+    const assigneeId = this.selectedUserIds[interventionId];
+    if (!assigneeId) return;
 
-    this.interventionService.assign(interventionId, this.selectedUserId).subscribe({
+    this.interventionService.assign(interventionId, assigneeId).subscribe({
       next: () => {
-        this.loadValidatedInterventions();
+        this.getAssigned();
       }
     })
   }
 
 
   ngOnInit(): void {
-    this.loadValidatedInterventions();
+    this.getAssigned();
     this.getAssignableUser();
   }
   getStatusClass(status: string): string {

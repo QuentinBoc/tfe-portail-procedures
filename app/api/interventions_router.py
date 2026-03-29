@@ -53,6 +53,52 @@ def get_all_interventions(
     )
     return interventions
 
+@router.get("/pending", response_model=list[InterventionOut],)
+def get_pending_interventions(
+    _current_user: User = Depends(require_min_level(4)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.status == "PENDING")
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions
+
+
+@router.get("/assigned", response_model=list[InterventionOut],)
+def get_assigned_interventions(
+    _current_user: User = Depends(require_min_level(3)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(
+            Intervention.status == "ASSIGNED",
+            Intervention.assigned_to == _current_user.id
+        )
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions
+
+@router.get("/validated", response_model=list[InterventionOut],)
+def get_validated_interventions(
+    _current_user: User = Depends(require_min_level(3)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.status == "VALIDATED")
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions
+
 @router.patch("/{id}/validate", response_model=InterventionOut)
 def validate_intervention(
     id: int,
@@ -95,7 +141,7 @@ def rejected_intervention(
 def assign_intervention(
     id: int,
     data: AssignRequest,
-    current_user: User = Depends(require_min_level(4)),
+    current_user: User = Depends(require_min_level(3)),
     db: Session =Depends(get_db),
 ):
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
@@ -133,30 +179,3 @@ def closed_intervention(
     
     return intervention
 
-@router.get("/pending", response_model=list[InterventionOut],)
-def get_pending_interventions(
-    _current_user: User = Depends(require_min_level(4)),
-    db: Session = Depends(get_db)):
-    
-    
-    interventions = (
-        db.query(Intervention)
-        .filter(Intervention.status == "PENDING")
-        .order_by(Intervention.created_at.desc())
-        .all()
-     )
-    return interventions
-
-@router.get("/validated", response_model=list[InterventionOut],)
-def get_validated_interventions(
-    _current_user: User = Depends(require_min_level(3)),
-    db: Session = Depends(get_db)):
-    
-    
-    interventions = (
-        db.query(Intervention)
-        .filter(Intervention.status == "VALIDATED")
-        .order_by(Intervention.created_at.desc())
-        .all()
-     )
-    return interventions

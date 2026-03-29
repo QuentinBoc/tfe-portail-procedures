@@ -41,8 +41,9 @@ export class InterventionService {
     return this.http.get(`${this.apiURL}/validated`);
   }
 
-  getAssignableUsers(){
-    
-    return this.http.get(`${this.apiURL}/assignableUsers`);
+  getAssigned() {
+    return this.http.get(`${this.apiURL}/assigned`);
   }
+
+  
 }

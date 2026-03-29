@@ -37,7 +37,7 @@ def create_user_endpoint(
             raise HTTPException(status_code=400, detail=str(e))
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/assignableUsers", response_model=list[UserOut])
+@router.get("", response_model=list[UserOut])
 def get_users(
     current_user: User = Depends(require_min_level(3)),
     db: Session = Depends(get_db)
