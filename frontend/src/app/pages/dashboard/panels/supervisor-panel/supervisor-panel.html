@@ -5,14 +5,14 @@
         <h2 class="text-2xl font-bold text-white">Demandes en cours</h2>
     </div>
 
-    @if (interventions.length === 0) {
+    @if (interventionsValidate.length === 0) {
     <div class="text-center py-12 text-gray-500">
         <p class="text-lg">Aucune demande pour le moment.</p>
     </div>
     }
 
     <div class="space-y-3">
-        @for (intervention of interventions; track intervention.id) {
+        @for (intervention of interventionsValidate; track intervention.id) {
         <div class="bg-white border rounded-xl p-4 shadow-sm flex justify-between items-center">
             <div>
                 <p class="font-semibold text-gray-800">{{ intervention.title }}</p>
@@ -21,7 +21,7 @@
             </div>
             <select [(ngModel)]="selectedUserIds[intervention.id]">
                 @for (user of users; track user.id) {
-                <option [value]="user.id">{{ user.full_name }}</option>
+                <option [ngValue]="user.id">{{ user.full_name }}</option>
                 }
             </select>
             <button (click)="assign(intervention.id)">Assigner</button>

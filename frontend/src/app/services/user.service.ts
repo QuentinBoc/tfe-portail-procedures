@@ -12,7 +12,7 @@ export class UserService {
 
   getAssignableUsers() {
 
-    return this.http.get(`${this.apiURL}`);
+    return this.http.get(`${this.apiURL}/assignableUsers`);
   }
 
 }

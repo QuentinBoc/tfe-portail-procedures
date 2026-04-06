@@ -4,6 +4,7 @@ from app.core.db import get_db
 from sqlalchemy.orm import Session
 
 from app.core.permissions import require_min_level
+from app.models.role import Role
 from app.models.user import User
 from app.services.user_service import create_user, get_assignable_users
 
@@ -37,9 +38,26 @@ def create_user_endpoint(
             raise HTTPException(status_code=400, detail=str(e))
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.get("/assignableUsers", response_model=list[UserOut])
+def get_assignable_users(
+    current_user: User = Depends(require_min_level(3)),
+    db: Session = Depends(get_db)):
+    
+    users = (
+        db.query(User).join(Role)
+        .filter(
+            Role.level == 2,
+        )
+        .all()
+    )
+    
+    return users
+
 @router.get("", response_model=list[UserOut])
 def get_users(
     current_user: User = Depends(require_min_level(3)),
     db: Session = Depends(get_db)
 ):
     return get_assignable_users(db, current_user.role_details.level)
+
+

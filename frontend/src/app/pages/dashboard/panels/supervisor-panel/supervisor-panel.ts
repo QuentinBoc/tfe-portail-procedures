@@ -2,20 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
 import { UserService } from '../../../../services/user.service';
 import { FormsModule } from '@angular/forms';
-
-
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-supervisor-panel',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule, CommonModule],
   templateUrl: './supervisor-panel.html',
   styleUrl: './supervisor-panel.css',
 })
 export class SupervisorPanel implements OnInit {
 
 
-  interventions: any[] = [];
+  interventionsValidate: any[] = [];
+  interventionsAssigned: any[] = [];
   users: any[] = [];
   selectedUserIds: Record<number, number> = {}
 
@@ -26,10 +25,21 @@ export class SupervisorPanel implements OnInit {
     private userService: UserService
   ) { }
 
+  getValidated(): void {
+    this.interventionService.getValidated().subscribe({
+      next: (data: any) => {
+        this.interventionsValidate = data;
+      },
+      error: (err) => {
+        console.log('Erreur', err)
+      }
+    })
+  }
+
   getAssigned(): void {
     this.interventionService.getAssigned().subscribe({
       next: (data: any) => {
-        this.interventions = data;
+        this.interventionsAssigned = data;
       },
       error: (err) => {
         console.log('Erreur', err)
@@ -55,6 +65,7 @@ export class SupervisorPanel implements OnInit {
 
     this.interventionService.assign(interventionId, assigneeId).subscribe({
       next: () => {
+        this.getValidated();
         this.getAssigned();
       }
     })
@@ -62,6 +73,7 @@ export class SupervisorPanel implements OnInit {
 
 
   ngOnInit(): void {
+    this.getValidated();
     this.getAssigned();
     this.getAssignableUser();
   }

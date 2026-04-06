@@ -70,7 +70,7 @@ def get_pending_interventions(
 
 @router.get("/assigned", response_model=list[InterventionOut],)
 def get_assigned_interventions(
-    _current_user: User = Depends(require_min_level(3)),
+    _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
     
     
@@ -98,6 +98,45 @@ def get_validated_interventions(
         .all()
      )
     return interventions
+
+@router.get("/processing", response_model=list[InterventionOut],)
+def get_processing_interventions(
+    _current_user: User = Depends(require_min_level(2)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.status == "PROCESSING")
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions
+
+
+@router.patch("/{id}/processing", response_model=InterventionOut,)
+def get_precessing_interventions(
+    id: int,
+    current_user: User = Depends(require_min_level(2)),
+    db: Session = Depends(get_db)):
+    
+    
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
+    if intervention is None:
+        raise HTTPException(status_code=404, detail="Intervention introuvable")
+    if intervention.status != "ASSIGNED":
+        raise HTTPException(status_code=400, detail="Intervention non validable")
+    if intervention.assigned_to == current_user.id:
+        intervention.status = "PROCESSING"
+    else:
+        raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
+    
+
+    db.commit()
+    db.refresh(intervention)
+
+    return intervention
+
 
 @router.patch("/{id}/validate", response_model=InterventionOut)
 def validate_intervention(
@@ -147,11 +186,8 @@ def assign_intervention(
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
-    elif intervention.status == "VALIDATED" and current_user.role_details.level >= 4:
+    elif intervention.status == "VALIDATED" and current_user.role_details.level >= 3:
         intervention.status ="ASSIGNED"
-        intervention.assigned_to = data.assignee_id
-    elif intervention.status == "ASSIGNED" and current_user.role_details.level >= 3:
-        intervention.status ="PROCESSING"
         intervention.assigned_to = data.assignee_id
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
@@ -165,15 +201,23 @@ def assign_intervention(
 def closed_intervention(
     id: int,
     current_user: User = Depends(require_min_level(2)),
-    db: Session =Depends(get_db)
+    db: Session = Depends(get_db)
 ):
+    """Fermeture d'une intervention par un techncien"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
     if intervention.status != "PROCESSING":
         raise HTTPException(status_code=400, detail="Seules les interventions en cours peuvent être fermées")
-    intervention.status ="CLOSED"
-    
+    # DEBUG TEMPORAIRE - à retirer avant la présentation
+    print(f"[DEBUG] current_user.id = {current_user.id!r}  type={type(current_user.id)}")
+    print(f"[DEBUG] intervention.assigned_to = {intervention.assigned_to!r}  type={type(intervention.assigned_to)}")
+    print(f"[DEBUG] level = {current_user.role_details.level}")
+    if current_user.role_details.level >=2 and current_user.id == intervention.assigned_to:
+        intervention.status = "CLOSED"
+    else:
+        raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
+
     db.commit()
     db.refresh(intervention)
     

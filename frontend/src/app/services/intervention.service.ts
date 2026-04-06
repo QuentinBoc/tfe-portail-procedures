@@ -33,6 +33,10 @@ export class InterventionService {
     return this.http.patch(`${this.apiURL}/${id}/assign`, {assignee_id : assigneeId});
   }
 
+  closedIntervention(id: number) {
+    return this.http.patch(`${this.apiURL}/${id}/closed`, {});
+  }
+
   getPending() {
     return this.http.get(`${this.apiURL}/pending`);
   }
@@ -41,8 +45,16 @@ export class InterventionService {
     return this.http.get(`${this.apiURL}/validated`);
   }
 
+  processingIntervention(id: number) {
+    return this.http.patch(`${this.apiURL}/${id}/processing`, {});
+  }
+
   getAssigned() {
     return this.http.get(`${this.apiURL}/assigned`);
+  }
+
+  getProcessing() {
+    return this.http.get(`${this.apiURL}/processing`);
   }
 
   
