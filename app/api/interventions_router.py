@@ -113,6 +113,23 @@ def get_processing_interventions(
      )
     return interventions
 
+@router.get("/getClosed", response_model=list[InterventionOut],)
+def get_closed_interventions(
+    _current_user: User = Depends(require_min_level(2)),
+    db: Session = Depends(get_db)):
+    
+    
+    interventions = (
+        db.query(Intervention)
+        .filter(
+            Intervention.status == "CLOSED",
+            Intervention.assigned_to == _current_user.id
+        )
+        .order_by(Intervention.created_at.desc())
+        .all()
+     )
+    return interventions
+
 
 @router.patch("/{id}/processing", response_model=InterventionOut,)
 def get_precessing_interventions(
@@ -209,10 +226,6 @@ def closed_intervention(
         raise HTTPException(status_code=404, detail="Intervention introuvable")
     if intervention.status != "PROCESSING":
         raise HTTPException(status_code=400, detail="Seules les interventions en cours peuvent être fermées")
-    # DEBUG TEMPORAIRE - à retirer avant la présentation
-    print(f"[DEBUG] current_user.id = {current_user.id!r}  type={type(current_user.id)}")
-    print(f"[DEBUG] intervention.assigned_to = {intervention.assigned_to!r}  type={type(intervention.assigned_to)}")
-    print(f"[DEBUG] level = {current_user.role_details.level}")
     if current_user.role_details.level >=2 and current_user.id == intervention.assigned_to:
         intervention.status = "CLOSED"
     else:

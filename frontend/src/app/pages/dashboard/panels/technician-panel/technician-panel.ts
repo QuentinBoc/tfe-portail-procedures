@@ -13,6 +13,7 @@ export class TechnicianPanel implements OnInit{
 
 interventionsAssigned: any[] = [];
 interventionsProcessing: any[] = [];
+interventionsClosed: any[] = [];
 
 constructor(
     private interventionService: InterventionService  ) { }
@@ -62,9 +63,20 @@ closeIntervention(id: number): void{
   })
 }
 
+getClosed(): void{
+  this.interventionService.getClosed().subscribe({
+    next: (data: any) => {
+        this.interventionsClosed = data;
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+  })
+}
 ngOnInit(): void {
     this.getAssigned();
     this.getProcessing();
+    this.getClosed();
   }
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {

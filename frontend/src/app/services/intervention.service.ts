@@ -57,5 +57,8 @@ export class InterventionService {
     return this.http.get(`${this.apiURL}/processing`);
   }
 
+  getClosed() {
+    return this.http.get(`${this.apiURL}/getClosed`);
+  }
   
 }
