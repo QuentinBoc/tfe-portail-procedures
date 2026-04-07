@@ -1,4 +1,40 @@
-<h1>Dashboard</h1>
-<p>Rôle : {{ roleLabel }}</p>
+<div class="app-container">
 
-<ng-container *ngComponentOutlet="ActivePanel"></ng-container>
+    <div class="sidebar" [class.expanded]="isExpanded">
+
+        <button (click)="toggleSidebar()">☰</button>
+
+        <div class="logo-area">
+            <img src="logo-arc.png" alt="Logo AR" class="logo-img">
+        </div>
+
+        <nav class="nav-menu">
+            <ul>
+                <li class="nav-item active">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-label">Interventions</span>
+                </li>
+                <li class="nav-item coming">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-label">New feature...</span>
+                </li>
+                <li class="nav-item coming">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">New feature...</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="user-info">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">{{ roleLabel }}</span>
+        </div>
+
+
+    </div>
+
+    <main class="main-content">
+        <ng-container *ngComponentOutlet="ActivePanel"></ng-container>
+    </main>
+
+</div>

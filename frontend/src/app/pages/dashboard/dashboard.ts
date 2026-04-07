@@ -18,8 +18,13 @@ type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
 export class Dashboard implements OnInit {
   role: RoleName | null = null;
   roleLabel: string | null = null;
-  ActivePanel: any=null;
-  
+  ActivePanel: any = null;
+  isExpanded: boolean = false;
+
+  toggleSidebar(): void {
+    this.isExpanded = !this.isExpanded
+  }
+
   panelMap: Record<RoleName, any> = {
     Admin: AdminPanel,
     Direction: ValidatorPanel,
@@ -28,7 +33,7 @@ export class Dashboard implements OnInit {
     Utilisateur: RequesterPanel,
   };
 
-  constructor(private auth: Auth) {}
+  constructor(private auth: Auth) { }
 
   ngOnInit(): void {
     this.auth.me().subscribe({
