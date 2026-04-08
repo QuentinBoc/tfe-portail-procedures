@@ -24,7 +24,7 @@
                 <option [ngValue]="user.id">{{ user.full_name }}</option>
                 }
             </select>
-            <button (click)="assign(intervention.id)">Assigner</button>
+            <button class="btn-primary" (click)="assign(intervention.id)">Assigner</button>
             <span class="px-3 py-1 rounded-full text-sm font-medium" [class]="getStatusClass(intervention.status)">
                 {{ intervention.status }}
             </span>
