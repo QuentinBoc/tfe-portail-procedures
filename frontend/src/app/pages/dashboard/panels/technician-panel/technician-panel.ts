@@ -32,7 +32,8 @@ getAssigned(): void{
 processingIntervention(id: number): void{
   this.interventionService.processingIntervention(id).subscribe({
     next: (data: any) => {
-        this.getProcessing()
+        this.getProcessing();
+        this.getAssigned();
       },
       error: (err) => {
         console.error('Erreur', err)
