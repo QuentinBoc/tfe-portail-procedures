@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { User } from "../models/users.model";
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class UserService {
 
   getAssignableUsers() {
 
-    return this.http.get(`${this.apiURL}/assignableUsers`);
+    return this.http.get<User[]>(`${this.apiURL}/assignableUsers`);
   }
 
 }

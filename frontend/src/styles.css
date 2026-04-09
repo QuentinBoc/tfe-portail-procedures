@@ -86,9 +86,5 @@ body {
     background-color: #16a34a;
     color: white;
   }
-  .card-actions {
-    display: flex;
-    justify-content:flex-end;
-    gap: 12px;
-  }
+  
 }

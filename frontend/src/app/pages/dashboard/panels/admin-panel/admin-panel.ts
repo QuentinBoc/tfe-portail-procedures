@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
 import { DatePipe } from '@angular/common';
+import { Intervention } from '../../../../models/intervention.model';
 
 
 
@@ -13,26 +14,27 @@ import { DatePipe } from '@angular/common';
 
 export class AdminPanel implements OnInit{
 
-  interventions: any[] = [];
+  interventions: Intervention[] = [];
 
   constructor(
     private interventionService: InterventionService,
   ) {}
-
+  /**Charge les methodes au demarrage du composant */
   ngOnInit(): void {
     this.allInterventions()
   }
-  
+  /**Récupère toutes les interventions */
   allInterventions(): void {
     this.interventionService.getAll().subscribe({
-      next: (data: any) => {
+      next: (data: Intervention[]) => {
         this.interventions = data;
       },
       error: (err) => {
-        console.log('Erreur', err)
+        console.error('Erreur', err)
       }
     })
   }
+  /**Applique un style selon statut */
   getStatusClass(status: string): string {
   const classes: Record<string, string> = {
     'PENDING':    'bg-yellow-100 text-yellow-800',

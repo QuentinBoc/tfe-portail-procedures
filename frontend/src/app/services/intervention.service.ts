@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Intervention } from "../models/intervention.model";
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class InterventionService {
   constructor(private http: HttpClient) { }
 
   getMine() {
-    return this.http.get(`${this.apiURL}/mine`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/mine`);
   }
 
   create(data: any) {
@@ -18,11 +19,11 @@ export class InterventionService {
   }
 
   getAll() {
-    return this.http.get(`${this.apiURL}/all`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/all`);
   }
 
   validate(id: number) {
-    return this.http.patch(`${this.apiURL}/${id}/validate`, {});
+    return this.http.patch<Intervention[]>(`${this.apiURL}/${id}/validate`, {});
   }
 
   reject(id: number) {
@@ -34,31 +35,31 @@ export class InterventionService {
   }
 
   closedIntervention(id: number) {
-    return this.http.patch(`${this.apiURL}/${id}/closed`, {});
+    return this.http.patch<Intervention>(`${this.apiURL}/${id}/closed`, {});
   }
 
   getPending() {
-    return this.http.get(`${this.apiURL}/pending`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/pending`);
   }
 
   getValidated() {
-    return this.http.get(`${this.apiURL}/validated`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/validated`);
   }
 
   processingIntervention(id: number) {
-    return this.http.patch(`${this.apiURL}/${id}/processing`, {});
+    return this.http.patch<Intervention>(`${this.apiURL}/${id}/processing`, {});
   }
 
   getAssigned() {
-    return this.http.get(`${this.apiURL}/assigned`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/assigned`);
   }
 
   getProcessing() {
-    return this.http.get(`${this.apiURL}/processing`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/processing`);
   }
 
   getClosed() {
-    return this.http.get(`${this.apiURL}/getClosed`);
+    return this.http.get<Intervention[]>(`${this.apiURL}/closed`);
   }
   
 }

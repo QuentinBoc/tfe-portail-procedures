@@ -14,8 +14,8 @@ def add_intervention(
     data: InterventionCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-    
     ):
+    """Création d'une intervention sur base du schemas et de l'utilisateur"""
     new_intervention = Intervention(
         title=data.title,
         description=data.description,
@@ -32,7 +32,7 @@ def add_intervention(
 def get_my_interventions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)):
-    
+    """Récupère les interventions selon l'utilisateur connecté"""
     interventions = (
         db.query(Intervention)
         .filter(Intervention.created_by == current_user.id)
@@ -45,7 +45,7 @@ def get_my_interventions(
 def get_all_interventions(
     current_user: User = Depends(require_min_level(5)),
     db: Session = Depends(get_db)):
-    
+    """Récupère toutes les interventions selon le role de l'utilisateur"""
     interventions = (
         db.query(Intervention)
         .order_by(Intervention.created_at.desc())
@@ -57,8 +57,7 @@ def get_all_interventions(
 def get_pending_interventions(
     _current_user: User = Depends(require_min_level(4)),
     db: Session = Depends(get_db)):
-    
-    
+    """Récupère les interventions en attentes"""
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "PENDING")
@@ -72,8 +71,7 @@ def get_pending_interventions(
 def get_assigned_interventions(
     _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
-    
-    
+    """Récupère les interventions assignées"""
     interventions = (
         db.query(Intervention)
         .filter(
@@ -89,8 +87,7 @@ def get_assigned_interventions(
 def get_validated_interventions(
     _current_user: User = Depends(require_min_level(3)),
     db: Session = Depends(get_db)):
-    
-    
+    """Récupère les interventions validées"""
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "VALIDATED")
@@ -103,8 +100,7 @@ def get_validated_interventions(
 def get_processing_interventions(
     _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
-    
-    
+    """Récupère les interventions en cours de traitements"""
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "PROCESSING")
@@ -113,12 +109,11 @@ def get_processing_interventions(
      )
     return interventions
 
-@router.get("/getClosed", response_model=list[InterventionOut],)
+@router.get("/closed", response_model=list[InterventionOut],)
 def get_closed_interventions(
     _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
-    
-    
+    """Récupère les interventions fermées"""
     interventions = (
         db.query(Intervention)
         .filter(
@@ -132,12 +127,11 @@ def get_closed_interventions(
 
 
 @router.patch("/{id}/processing", response_model=InterventionOut,)
-def get_precessing_interventions(
+def process_intervention(
     id: int,
     current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
-    
-    
+    """Modifie le statut de l'intervention d'assignée vers en cours de traitement"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
@@ -161,6 +155,7 @@ def validate_intervention(
     current_user: User = Depends(require_min_level(4)),
     db: Session = Depends(get_db),
 ):
+    """Modifie le statut de l'intervention de En attente vers Validé"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
@@ -175,11 +170,12 @@ def validate_intervention(
     return intervention
 
 @router.patch("/{id}/rejected", response_model=InterventionOut)
-def rejected_intervention(
+def reject_intervention(
     id: int,
     current_user: User = Depends(require_min_level(4)),
     db: Session =Depends(get_db)
 ):
+    """Rejet d'une intervention"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
@@ -200,6 +196,7 @@ def assign_intervention(
     current_user: User = Depends(require_min_level(3)),
     db: Session =Depends(get_db),
 ):
+    """Attribution d'une intervention vers un utilisateur"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
@@ -215,12 +212,12 @@ def assign_intervention(
     return intervention
 
 @router.patch("/{id}/closed", response_model=InterventionOut)
-def closed_intervention(
+def close_intervention(
     id: int,
     current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)
 ):
-    """Fermeture d'une intervention par un techncien"""
+    """Fermeture d'une intervention par un technicien"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")

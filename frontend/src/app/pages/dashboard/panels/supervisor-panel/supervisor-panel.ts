@@ -3,6 +3,8 @@ import { InterventionService } from '../../../../services/intervention.service';
 import { UserService } from '../../../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, CommonModule } from '@angular/common';
+import { Intervention } from '../../../../models/intervention.model';
+import { User } from '../../../../models/users.model';
 
 @Component({
   selector: 'app-supervisor-panel',
@@ -13,9 +15,9 @@ import { DatePipe, CommonModule } from '@angular/common';
 export class SupervisorPanel implements OnInit {
 
 
-  interventionsValidate: any[] = [];
-  interventionsAssigned: any[] = [];
-  users: any[] = [];
+  interventionsValidate: Intervention[] = [];
+  interventionsAssigned: Intervention[] = [];
+  users: User[] = [];
   selectedUserIds: Record<number, number> = {}
 
 
@@ -24,41 +26,41 @@ export class SupervisorPanel implements OnInit {
     private interventionService: InterventionService,
     private userService: UserService
   ) { }
-
+  /**Récupère les interventions validées */
   getValidated(): void {
     this.interventionService.getValidated().subscribe({
-      next: (data: any) => {
+      next: (data: Intervention[]) => {
         this.interventionsValidate = data;
       },
       error: (err) => {
-        console.log('Erreur', err)
+        console.error('Erreur', err)
       }
     })
   }
-
+  /**Récupère les interventions assignées */
   getAssigned(): void {
     this.interventionService.getAssigned().subscribe({
-      next: (data: any) => {
+      next: (data: Intervention[]) => {
         this.interventionsAssigned = data;
       },
       error: (err) => {
-        console.log('Erreur', err)
+        console.error('Erreur', err)
       }
     })
   }
 
-
+  /**Récupère les utilisateurs qui peuvent être assignable */
   getAssignableUser(): void {
     this.userService.getAssignableUsers().subscribe({
-      next: (data: any) => {
+      next: (data: User[]) => {
         this.users = data;
       },
       error: (err) => {
-        console.log('Erreur', err)
+        console.error('Erreur', err)
       }
     })
   }
-  
+  /**Assigne l'intervention à un utilisateur */
   assign(interventionId: number): void {
     const assigneeId = this.selectedUserIds[interventionId];
     if (!assigneeId) return;
@@ -71,12 +73,13 @@ export class SupervisorPanel implements OnInit {
     })
   }
 
-
+  /**Charge les methodes au demarrage du composant */
   ngOnInit(): void {
     this.getValidated();
     this.getAssigned();
     this.getAssignableUser();
   }
+  /**Applique un style selon statut */
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {
       'PENDING': 'bg-yellow-100 text-yellow-800',

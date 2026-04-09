@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
 import { DatePipe } from '@angular/common';
+import { Intervention } from '../../../../models/intervention.model';
 
 
 @Component({
@@ -10,23 +11,23 @@ import { DatePipe } from '@angular/common';
   styleUrl: './validator-panel.css',
 })
 export class ValidatorPanel implements OnInit {
-  interventions: any[] = [];
+  interventions: Intervention[] = [];
 
   constructor(
     private interventionService: InterventionService,
   ) { }
-
+  /**Charge les interventions en attentes */
   loadPendingInterventions(): void {
     this.interventionService.getPending().subscribe({
-      next: (data: any) => {
+      next: (data: Intervention[]) => {
         this.interventions = data;
       },
       error: (err) => {
-        console.log('Erreur', err)
+        console.error('Erreur', err)
       }
     })
   }
-
+  /**Valide une intervention et recharge les interventions en attente */
   validate(id: number): void {
     this.interventionService.validate(id).subscribe({
       next: () => {
@@ -34,6 +35,7 @@ export class ValidatorPanel implements OnInit {
       }
     })
   }
+  /**Rejète une intervention */
   reject(id: number): void {
     this.interventionService.reject(id).subscribe({
       next: () => {
@@ -41,10 +43,11 @@ export class ValidatorPanel implements OnInit {
       }
     })
   }
-
+  /**Charge les methodes au démarrage */
   ngOnInit(): void {
     this.loadPendingInterventions()
   }
+  /**Applique un style aux statuts */
   getStatusClass(status: string): string {
   const classes: Record<string, string> = {
     'PENDING':    'bg-yellow-100 text-yellow-800',
