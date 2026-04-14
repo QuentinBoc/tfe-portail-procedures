@@ -1,0 +1,9 @@
+Intercepteur Angular — que se passe-t-il avec le localStorage quand le token expire ?
+Intercepteur Angular — que se passe-t-il si le backend retourne un 403 ?
+Modèle SQLAlchemy — status accepte n'importe quelle valeur string
+Gestion d'erreurs — les réponses d'erreur ne sont pas standardisées globalement
+fichier test automatique avec pytest
+implémenter table reports
+status et type en varchar - enum prevu
+proteger post user
+localstorage faille xss -> httponly cookie

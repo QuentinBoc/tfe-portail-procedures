@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 from app.api.schemas import InterventionCreate, InterventionOut, AssignRequest
@@ -15,7 +17,7 @@ def add_intervention(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
     ):
-    """Création d'une intervention sur base du schemas et de l'utilisateur"""
+    """Création d'une intervention sur base du schema et de l'utilisateur"""
     new_intervention = Intervention(
         title=data.title,
         description=data.description,
@@ -139,6 +141,8 @@ def process_intervention(
         raise HTTPException(status_code=400, detail="Intervention non validable")
     if intervention.assigned_to == current_user.id:
         intervention.status = "PROCESSING"
+        intervention.processing_by = current_user.id
+        intervention.processing_at = datetime.now(timezone.utc)
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
     
@@ -163,6 +167,7 @@ def validate_intervention(
         raise HTTPException(status_code=400, detail="Intervention non validable")
     intervention.status ="VALIDATED"
     intervention.validated_by = current_user.id
+    intervention.validated_at = datetime.now(timezone.utc)
 
     db.commit()
     db.refresh(intervention)
@@ -182,7 +187,8 @@ def reject_intervention(
     if intervention.status != "PENDING":
         raise HTTPException(status_code=400, detail="Seules les interventions en attente peuvent être rejetées")
     intervention.status ="REJECTED"
-    intervention.validated_by = current_user.id
+    intervention.rejected_by = current_user.id
+    intervention.rejected_at = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(intervention)
@@ -200,9 +206,10 @@ def assign_intervention(
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
-    elif intervention.status == "VALIDATED" and current_user.role_details.level >= 3:
+    elif intervention.status == "VALIDATED":
         intervention.status ="ASSIGNED"
         intervention.assigned_to = data.assignee_id
+        intervention.assigned_at = datetime.now(timezone.utc)
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
             
@@ -225,6 +232,8 @@ def close_intervention(
         raise HTTPException(status_code=400, detail="Seules les interventions en cours peuvent être fermées")
     if current_user.role_details.level >=2 and current_user.id == intervention.assigned_to:
         intervention.status = "CLOSED"
+        intervention.closed_by = current_user.id
+        intervention.closed_at = datetime.now(timezone.utc)
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
 
