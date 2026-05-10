@@ -1,28 +1,48 @@
-<div class="min-h-screen flex items-center justify-center login-bg">
-  <div class="app-card w-full max-w-md">
-    <h1 class="text-2xl font-semibold mb-2">Connexion</h1>
-    <p class="text-sm text-[var(--muted)] mb-6">
+<!-- Parent Grid : place-items-center centre tout parfaitement -->
+<div class="grid grid-cols-1 min-h-screen place-items-center login-bg p-4">
+  
+  <!-- Carte : Ajout de border pour définir la forme et bg-slate-900 pour le contraste -->
+  <div class="w-full max-w-md bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl p-8 shadow-2xl">
+    
+    <h1 class="text-3xl font-bold tracking-tight text-white mb-2">
+      Connexion
+    </h1>
+    <p class="text-sm text-slate-400 mb-8">
       Accès au portail interne
     </p>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
-      <input
-        type="email"
-        formControlName="email"
-        placeholder="Email"
-        class="app-input"
-      />
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <div class="space-y-2">
+        <label class="text-[11px] uppercase tracking-wider font-bold text-slate-400 ml-1">
+          Email
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="prenom.nom@atheneecomines.be"
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-400 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+        />
+      </div>
 
-      <input
-        type="password"
-        formControlName="password"
-        placeholder="Mot de passe"
-        class="app-input"
-      />
+      <div class="space-y-2">
+        <label class="text-[11px] uppercase tracking-wider font-bold text-slate-400 ml-1">
+          Mot de passe
+        </label>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+        />
+      </div>
 
-      <button type="submit" class="app-btn-primary" [disabled]="loading">
+      <button type="submit" 
+        class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-[0.98]" 
+        [disabled]="loading">
         {{ loading ? 'Connexion...' : 'Se connecter'}}
       </button>
+
     </form>
   </div>
 </div>

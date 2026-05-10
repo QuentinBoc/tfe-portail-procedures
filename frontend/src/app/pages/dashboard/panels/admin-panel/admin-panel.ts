@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
 import { DatePipe } from '@angular/common';
-import { Intervention } from '../../../../models/intervention.model';
+import { Intervention } from '../../../interfaces/intervention.model';
 
 
 

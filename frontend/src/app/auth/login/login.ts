@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
-import { Auth } from '../auth';
+import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 
 
@@ -21,7 +21,7 @@ loading = false;
 
   constructor(
     private fb: FormBuilder, 
-    private auth: Auth,
+    private auth: AuthService,
     private router: Router,
    ) {
     this.form = this.fb.group({

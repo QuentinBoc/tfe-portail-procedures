@@ -1,17 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
-import { DatePipe } from '@angular/common';
-import { Intervention } from '../../../../models/intervention.model';
+import { DatePipe, NgClass } from '@angular/common';
+import { Intervention } from '../../../interfaces/intervention.model';
+import { IStatusInfo } from '../../../interfaces/ilabel';
 
 
 @Component({
   selector: 'app-validator-panel',
-  imports: [DatePipe],
+  imports: [DatePipe, NgClass],
   templateUrl: './validator-panel.html',
   styleUrl: './validator-panel.css',
+  
 })
 export class ValidatorPanel implements OnInit {
   interventions: Intervention[] = [];
+  selectedIntervention: Intervention | null = null;
+  interventionsValidated: Intervention[] = [];
 
   constructor(
     private interventionService: InterventionService,
@@ -43,21 +47,72 @@ export class ValidatorPanel implements OnInit {
       }
     })
   }
+  /**Confirmation de rejet d'une intervention */
+  onConfirmReject(id: number): void {
+  if (confirm('Etes-vous certain de vouloir rejeter cette intervention ?')) {
+    this.reject(id);
+    }
+  }
+
+  /** Récupère les interventions assignées */
+  getValidated(): void {
+    this.interventionService.getValidated().subscribe({
+      next: (data: Intervention[]) => {
+        this.interventionsValidated = data;
+      },
+      error: (err) => {
+        console.error('Erreur', err);
+      }
+    });
+  }
+  
+  /** Extention des cartes interventions en accordéon */
+  expandedId: number | null = null
+  toggleDetails(id: number){
+    if (this.expandedId === id){
+      this.expandedId = null
+    }else{
+      this.expandedId = id
+    }
+  }
   /**Charge les methodes au démarrage */
   ngOnInit(): void {
-    this.loadPendingInterventions()
+    this.loadPendingInterventions(),
+    this.getValidated()
   }
-  /**Applique un style aux statuts */
-  getStatusClass(status: string): string {
-  const classes: Record<string, string> = {
-    'PENDING':    'bg-yellow-100 text-yellow-800',
-    'VALIDATED':  'bg-blue-100 text-blue-800',
-    'ASSIGNED':   'bg-indigo-100 text-indigo-800',
-    'PROCESSING': 'bg-purple-100 text-purple-800',
-    'CLOSED':     'bg-green-100 text-green-800',
-    'REJECTED':   'bg-red-100 text-red-800',
-  };
-  return classes[status] ?? 'bg-gray-100 text-gray-800';
+  /** Retourne le label français et la classe CSS selon le statut */
+    getStatusClass(status: string): IStatusInfo {
+      const classes: Record<string, IStatusInfo> = {
+        'PENDING':    { label: 'En attente',             cssClass: 'text-yellow-500 bg-yellow-100/60 dark:bg-gray-800' },
+        'VALIDATED':  { label: 'Validée par direction',  cssClass: 'text-blue-500 bg-blue-100/60 dark:bg-gray-800' },
+        'ASSIGNED':   { label: 'Assignée au technicien',  cssClass: 'text-indigo-500 bg-indigo-100/60 dark:bg-gray-800' },
+        'PROCESSING': { label: 'Intervention en cours',   cssClass: 'text-purple-500 bg-purple-100/60 dark:bg-gray-800' },
+        'CLOSED':     { label: 'Intervention clôturée',   cssClass: 'text-emerald-500 bg-emerald-100/60 dark:bg-gray-800' },
+        'REJECTED':   { label: 'Intervention rejetée',    cssClass: 'text-red-500 bg-red-100/60 dark:bg-gray-800' },
+      };
+      return classes[status] ?? { label: 'Statut inconnu', cssClass: 'text-gray-500 bg-gray-100/60 dark:bg-gray-800' };
+    }
+
+  /** Sélectionne une intervention pour afficher ses détails */
+  selectIntervention(intervention: Intervention): void {
+    this.selectedIntervention = intervention;
+  }
+
+  /** Retourne la classe CSS de la barre de progression selon le statut */
+  getProgressWidth(status: string): string {
+    const classes: Record<string, string> = {
+      'PENDING':    'bg-blue-500 w-1/5 h-1.5',
+      'VALIDATED':  'bg-blue-500 w-2/5 h-1.5',
+      'ASSIGNED':   'bg-blue-500 w-3/5 h-1.5',
+      'PROCESSING': 'bg-blue-500 w-4/5 h-1.5',
+      'CLOSED':     'bg-emerald-500 w-full h-1.5',
+      'REJECTED':   'bg-red-500 w-full h-1.5',
+    };
+    return classes[status] ?? 'bg-yellow-500 w-full h-1.5';
+  }
+  /** Ferme le panneau de détails */
+  closeDetails(): void {
+    this.selectedIntervention = null;
   }
 }
 

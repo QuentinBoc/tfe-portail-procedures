@@ -42,9 +42,6 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 2.5) !important;
   }
 
-  label {
-    color: #1e293b !important;
-  }
 
   .bg-white {
     color: #1e293b;
@@ -87,4 +84,19 @@ body {
     color: white;
   }
   
+  .btn-alert {
+    color: #d42717;
+    background: transparent;
+    border: 1px solid #ea2712;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .btn-success:hover {
+    background-color: #e27676;
+    color: white;
+  }
 }

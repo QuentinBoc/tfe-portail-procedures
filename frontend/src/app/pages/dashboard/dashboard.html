@@ -1,48 +1,62 @@
 <div class="app-wrapper">
 
-  <header class="app-header">
-    <span class="header-title">Portail Athénée Royal Comines</span>
-    <div class="header-user">
-      <span class="nav-item">Connecté : {{ roleLabel }}</span>
-    </div>
-  </header>
-<div class="app-container">
+    <header class="app-header">
+        <button (click)="toggleSidebar()" class="burger-btn text-white text-2xl">☰</button>
+        <span class="header-title header-title-short">Portail AR Comines</span>
+        <span class="header-title header-title-full">Portail Athénée Royal Comines</span>
 
-    <div class="sidebar" [class.expanded]="isExpanded">
+        <div class="header-user">
+            <div class="user-chip">
+                <div class="user-avatar">{{ roleLabel?.charAt(0) }}</div>
+                <span class="user-role">{{ roleLabel }}</span>
+            </div>
+        </div>
+    </header>
+    <div class="app-container">
 
-        <button (click)="toggleSidebar()">☰</button>
+        <div class="sidebar" [class.expanded]="isExpanded">
 
-        <div class="logo-area">
-            <img src="logo-arc.png" alt="Logo AR" class="logo-img">
+            <div class="logo-area">
+                <img src="logo-arc.png" alt="Logo AR" class="logo-img">
+            </div>
+
+            <nav class="nav-menu">
+                <ul>
+                    <li class="nav-item active">
+                        <span class="nav-icon">🔧</span>
+                        <span class="nav-label">Interventions</span>
+                    </li>
+                    <li class="nav-item coming">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">New feature...</span>
+                    </li>
+                    <li class="nav-item coming">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">New feature...</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="logout">
+                <button (click)="logout()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#ffffff"
+                        style="opacity:1;">
+                        <path
+                            d="m17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5M4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4z" />
+                    </svg>
+                    <span>Se déconnecter</span>
+                </button>
+            </div>
         </div>
 
-        <nav class="nav-menu">
-            <ul>
-                <li class="nav-item active">
-                    <span class="nav-icon">🔧</span>
-                    <span class="nav-label">Interventions</span>
-                </li>
-                <li class="nav-item coming">
-                    <span class="nav-icon">📅</span>
-                    <span class="nav-label">New feature...</span>
-                </li>
-                <li class="nav-item coming">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-label">New feature...</span>
-                </li>
-            </ul>
-        </nav>
 
-        <div class="user-info">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">{{ roleLabel }}</span>
-        </div>
-
-
+        <main class="main-content">
+            @if (role === 'Utilisateur') { <app-requester-panel /> }
+            @if (role === 'Admin') { <app-admin-panel /> }
+            @if (role === 'Direction') { <app-validator-panel /> }
+            @if (role === 'Chef') { <app-supervisor-panel /> }
+            @if (role === 'Technicien') { <app-technician-panel /> }
+        </main>
     </div>
-
-    <main class="main-content">
-        <ng-container *ngComponentOutlet="ActivePanel"></ng-container>
-    </main>
 
 </div>

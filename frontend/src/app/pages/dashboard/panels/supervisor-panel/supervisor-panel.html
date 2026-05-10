@@ -1,34 +1,121 @@
-<div class="p-6 max-w-4xl mx-auto">
+<div class="flex justify-between items-center px-6 py-4">
+  <h2 class="text-2xl font-extrabold tracking-tight text-white italic">Demandes en cours</h2>
+</div>
 
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-white">Demandes en cours</h2>
+<div class="flex flex-col lg:flex-row gap-4 px-4 lg:px-6">
+
+
+  <div class="flex-1">
+    <div class="bg-gray-800/50 rounded-lg border border-gray-700 p-4 mb-2">
+      <h3 class="text-sm font-semibold text-center text-gray-400 uppercase tracking-wider">À assigner</h3>
     </div>
-
-    @if (interventionsValidate.length === 0) {
-    <div class="text-center py-12 text-gray-500">
-        <p class="text-lg">Aucune demande pour le moment.</p>
-    </div>
-    }
-
-    <div class="space-y-3">
-        @for (intervention of interventionsValidate; track intervention.id) {
-        <div class="bg-white border rounded-xl p-4 shadow-sm flex justify-between items-center">
-            <div>
-                <p class="font-semibold text-gray-800">{{ intervention.title }}</p>
-                <p class="text-sm text-gray-500">{{ intervention.location }}</p>
-                <p class="text-sm text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
-            </div>
-            <select [(ngModel)]="selectedUserIds[intervention.id]">
-                @for (user of users; track user.id) {
-                <option [ngValue]="user.id">{{ user.full_name }}</option>
-                }
-            </select>
-            <button class="btn-primary" (click)="assign(intervention.id)">Assigner</button>
-            <span class="px-3 py-1 rounded-full text-sm font-medium" [class]="getStatusClass(intervention.status)">
-                {{ intervention.status }}
-            </span>
-
+    <div class="grid grid-cols-1 gap-3">
+      @for (intervention of interventionsValidate; track intervention.id) {
+      <div
+        class="bg-gray-900 border border-gray-700 rounded-xl p-4 hover:bg-gray-800/70 transition-colors cursor-pointer"
+        (click)="toggleDetails(intervention.id)">
+        <div class="flex items-center justify-between mb-3">
+          <div class="inline-block px-3 py-1 text-xs font-semibold rounded-full"
+            [ngClass]="getStatusClass(intervention.status).cssClass">
+            {{ getStatusClass(intervention.status).label }}
+          </div>
+          <span class="text-xs text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
         </div>
-        }
+        <h4 class="text-white font-semibold mb-1">{{ intervention.title }}</h4>
+        <p class="text-gray-400 text-sm mb-3">Lieu: {{ intervention.location }}</p>
+        <div class="flex items-center gap-2 pt-3 border-t border-gray-700">
+          <select [(ngModel)]="selectedUserIds[intervention.id]"
+            class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            (click)="$event.stopPropagation()">
+            <option [ngValue]="undefined" disabled>Choisir un technicien</option>
+            @for (user of users; track user.id) {
+            <option [ngValue]="user.id">{{ user.full_name }}</option>
+            }
+          </select>
+          <button (click)="assign(intervention.id); $event.stopPropagation()"
+            class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+            Assigner
+          </button>
+        </div>
+      </div>
+      }
+      @if (interventionsValidate.length === 0) {
+      <div class="text-center py-8 text-gray-500">
+        <p>Aucune demande à assigner.</p>
+      </div>
+      }
     </div>
+  </div>
+
+
+  <div class="flex-1">
+    <div class="bg-gray-800/50 rounded-lg border border-gray-700 p-4 mb-2">
+      <h3 class="text-sm text-center font-semibold text-gray-400 uppercase tracking-wider">En cours...</h3>
+    </div>
+    <div class="grid grid-cols-1 gap-3">
+      @for (intervention of interventionsAssigned; track intervention.id) {
+      <div
+        class="bg-gray-900 border border-gray-700 rounded-xl p-4 hover:bg-gray-800/70 transition-colors cursor-pointer"
+        (click)="toggleDetails(intervention.id)">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-white font-semibold mb-1">{{ intervention.title }}</h4>
+          
+          <span class="text-xs text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
+        </div>
+        
+        <div class="pt-3 border-t border-gray-700">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs text-gray-500">Progression</span>
+          </div>
+          <div class="w-full h-1.5 bg-gray-700 rounded-full">
+            <div [class]="getProgressWidth(intervention.status)"
+              class="h-full rounded-full transition-all duration-500">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid transition-all duration-900"
+        [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+        <div class="w-full overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div
+            class="bg-gray-50 dark:bg-gray-800 px-4 py-3.5 flex items-center border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-normal text-gray-500 dark:text-gray-400">Détails de l'intervention</h3>
+          </div>
+          <div class="bg-white dark:bg-gray-900 p-6 space-y-4 text-sm">
+            <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-slate-500 font-medium">Titre</span>
+              <span class="text-base font-semibold text-slate-100">{{ intervention.title }}</span>
+            </div>
+            <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-slate-500 font-medium">Lieu</span>
+              <span class="text-base text-slate-100">{{ intervention.location }}</span>
+            </div>
+            <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-slate-500 font-medium">Date de création</span>
+              <span class="font-mono text-slate-100">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
+            </div>
+            <div class="flex flex-col pb-2">
+              <span class="text-slate-500 font-medium mb-1">Statut</span>
+              <span [ngClass]="getStatusClass(intervention.status).cssClass"
+                class="inline-block w-fit px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                {{ getStatusClass(intervention.status).label }}
+              </span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      }
+      @if (interventionsAssigned.length === 0) {
+      <div class="text-center py-8 text-gray-500">
+        <p>Aucune intervention assignée.</p>
+      </div>
+      }
+    </div>
+  </div>
+
+
+
+
+</div>

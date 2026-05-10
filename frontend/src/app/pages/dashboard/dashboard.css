@@ -2,6 +2,7 @@
     display: flex;
     flex: 1;
     background-color: #0f1117;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -12,10 +13,12 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+
 }
 
 .sidebar.expanded {
-    width: 220px;
+    width: 180px;
 }
 
 
@@ -28,7 +31,7 @@
 }
 
 
-button {
+.app-header button {
     color: #ffffff;
     background: none;
     border: none;
@@ -37,12 +40,28 @@ button {
     cursor: pointer;
 }
 
+.burger-btn {
+    width: 60px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    flex-shrink: 0;
+}
+
 .nav-label {
     opacity: 0;
     white-space: nowrap;
     overflow: hidden;
     max-width: 0;
     transition: opacity 0.3s ease, max-width 0.3s ease;
+}
+
+.nav-icon {
+    min-width: 24px;
+    text-align: center;
+    font-size: 20px;
 }
 
 .sidebar.expanded .nav-label {
@@ -56,13 +75,29 @@ button {
     margin: 0;
 }
 
-.nav-item {
+.nav-menu li {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    cursor: pointer;
-    color: #ffffff;
+    padding: 12px 0 12px 18px;
     gap: 12px;
+    cursor: pointer;
+}
+
+
+.logout button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-left: 3px solid transparent;
+    background: none;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
 }
 
 .nav-item.active {
@@ -119,7 +154,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 24px 0 0;
   height: 56px;
   background-color: #1a1f2e;
   border-bottom: 2px solid #878788;
@@ -130,4 +165,127 @@ button {
   font-weight: bold;
   font-size: 18px;
   color: #ffffff;
+  text-align: left;
+}
+
+.header-title-full {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .header-title-short {
+    display: none;
+  }
+  .header-title-full {
+    display: inline;
+  }
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2a2f3e;
+    border-radius: 20px;
+    padding: 4px 12px 4px 4px;
+    border: 1px solid #f0a500;
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #f0a500;
+    color: #1a1f2e;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-role {
+    color: #ffffff;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .user-role {
+        display: none;
+    }
+
+    .user-chip {
+        padding: 4px;
+        border-radius: 50%;
+    }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    height: calc(100vh - 56px);
+    z-index: 40;
+    width: 220px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.expanded {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+}
+
+.logout{
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+}
+
+.logout span{
+    font-size: 12px;
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.logout button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    padding-left: 18px;
+    height: 48px;
+    border-left: 3px solid transparent;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    background: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.logout svg {
+    min-width: 24px;
+}
+
+.sidebar.expanded .logout span{
+    opacity: 1;
+    max-width: 200px;
+    overflow: visible;
 }

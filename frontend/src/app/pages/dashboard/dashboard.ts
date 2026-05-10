@@ -1,17 +1,17 @@
+import { AuthService } from './../../auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { AdminPanel } from './panels/admin-panel/admin-panel';
 import { ValidatorPanel } from './panels/validator-panel/validator-panel';
 import { TechnicianPanel } from './panels/technician-panel/technician-panel';
 import { SupervisorPanel } from './panels/supervisor-panel/supervisor-panel';
 import { RequesterPanel } from './panels/requester-panel/requester-panel';
-import { Auth } from '../../auth/auth';
 import { CommonModule } from '@angular/common';
 
 type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, RequesterPanel, AdminPanel, ValidatorPanel, SupervisorPanel, TechnicianPanel],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -33,7 +33,7 @@ export class Dashboard implements OnInit {
     Utilisateur: RequesterPanel,
   };
 
-  constructor(private auth: Auth) { }
+  constructor(private auth: AuthService) { }
 
   ngOnInit(): void {
     this.auth.me().subscribe({
@@ -47,6 +47,10 @@ export class Dashboard implements OnInit {
         this.ActivePanel = null;
       }
     })
+  }
+
+  logout(): void{
+    this.auth.logout()
   }
 
 }

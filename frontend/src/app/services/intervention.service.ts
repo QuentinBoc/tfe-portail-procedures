@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Intervention } from "../models/intervention.model";
+import { Intervention } from "../pages/interfaces/intervention.model";
 
 @Injectable({
   providedIn: 'root',
