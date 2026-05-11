@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 export class Login {
 
 loading = false;
+errorMessage = '';
 
   form;
 
@@ -52,6 +53,7 @@ loading = false;
       },
       error: (err) => {
             this.loading = false;
+            this.errorMessage = 'Email ou mot de passe incorrect.';
             console.log('Erreur loggin', err?.error ?? err);
       },
     });

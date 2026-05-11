@@ -69,21 +69,19 @@ def get_pending_interventions(
     return interventions
 
 
-@router.get("/assigned", response_model=list[InterventionOut],)
+@router.get("/assigned", response_model=list[InterventionOut])
 def get_assigned_interventions(
-    _current_user: User = Depends(require_min_level(2)),
+    current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
     """Récupère les interventions assignées"""
-    interventions = (
-        db.query(Intervention)
-        .filter(
-            Intervention.status == "ASSIGNED",
-            Intervention.assigned_to == _current_user.id
-        )
-        .order_by(Intervention.created_at.desc())
-        .all()
-     )
+    query = db.query(Intervention).filter(Intervention.status == "ASSIGNED")
+
+    if current_user.role_id < 3:
+        query = query.filter(Intervention.assigned_to == current_user.id)
+
+    interventions = query.order_by(Intervention.created_at.desc()).all()
     return interventions
+    
 
 @router.get("/validated", response_model=list[InterventionOut],)
 def get_validated_interventions(

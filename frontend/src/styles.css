@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0b1220;
-  --card: #0f172a;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
+  --bg: #FCEED7;
+  --card: #ffffff;
+  --text: #3E5153;
+  --muted: #628276;
 }
 
 html,
@@ -25,7 +25,7 @@ body {
   }
 
   .app-input {
-    @apply w-full px-4 py-2 rounded-lg bg-transparent border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply w-full px-4 py-2 rounded-lg bg-transparent border border-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F];
   }
 
   .app-btn-primary {
@@ -34,12 +34,12 @@ body {
 
   .login-bg {
     background:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.15), transparent 60%),
-      linear-gradient(180deg, #020617, #020617);
+      radial-gradient(circle at top, rgba(255, 209, 149, 0.15), transparent 60%),
+      linear-gradient(180deg, #3E5153, #2a3a3b);
   }
 
   .shadow-sm {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 2.5) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
   }
 
 
@@ -53,50 +53,68 @@ body {
   }
 
   .btn-primary {
-    color: #2563eb;
-    background: transparent;
-    border: 1px solid #2563eb;
-    padding: 6px 14px;
-    border-radius: 6px;
+    color: #ffffff;
+    background: #3E5153;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(62, 81, 83, 0.3);
     transition: all 0.2s;
   }
 
   .btn-primary:hover {
-    background-color: #2563eb;
-    color: white;
+    background: #416F6F;
+    box-shadow: 0 4px 16px rgba(62, 81, 83, 0.4);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
   }
 
   .btn-success {
-    color: #16a34a;
-    background: transparent;
-    border: 1px solid #16a34a;
-    padding: 6px 14px;
-    border-radius: 6px;
+    color: #ffffff;
+    background: #16a34a;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
     transition: all 0.2s;
   }
 
   .btn-success:hover {
-    background-color: #16a34a;
-    color: white;
+    background: #22c55e;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.4);
   }
-  
+
+  .btn-success:active {
+    transform: scale(0.98);
+  }
+
   .btn-alert {
-    color: #d42717;
-    background: transparent;
-    border: 1px solid #ea2712;
-    padding: 6px 14px;
-    border-radius: 6px;
+    color: #ffffff;
+    background: #dc2626;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     transition: all 0.2s;
   }
 
-  .btn-success:hover {
-    background-color: #e27676;
-    color: white;
+  .btn-alert:hover {
+    background: #ef4444;
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  }
+
+  .btn-alert:active {
+    transform: scale(0.98);
   }
 }

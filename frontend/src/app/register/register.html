@@ -14,7 +14,7 @@
 
     <div class="mb-8 flex flex-col items-center gap-3">
       <img src="logo-arc.png" alt="Logo ARC" class="h-30 object-contain" />
-      <p class="text-xs uppercase tracking-[0.2em] text-[#9D9E81] font-medium">Portail interne</p>
+      <p class="text-xs uppercase tracking-[0.2em] text-[#9D9E81] font-medium">Inscription au portail de l'athénée Royal de Comines</p>
     </div>
 
     <div class="w-full max-w-sm">
@@ -23,32 +23,47 @@
 
         <div class="space-y-1.5">
           <label class="text-[11px] uppercase tracking-wider font-semibold text-[#9D9E81]">Email</label>
-          <input type="email" formControlName="email" placeholder="prenom.nom@atheneecomines.be"
+          <input type="email" formControlName="email"
+            placeholder="prenom.nom@atheneecomines.be"
             class="w-full bg-[#1e2e30] border border-[#416F6F]/50 rounded-xl px-4 py-3 text-white placeholder:text-[#628276] focus:outline-none focus:ring-2 focus:ring-[#FFD195]/40 focus:border-[#FFD195]/60 transition-all" />
         </div>
 
         <div class="space-y-1.5">
-          <label class="text-[11px] uppercase tracking-wider font-semibold text-[#9D9E81]">Mot de passe</label>
-          <input type="password" formControlName="password" placeholder="••••••••"
+          <label class="text-[11px] uppercase tracking-wider font-semibold text-[#9D9E81]">Prénom + Nom</label>
+          <input type="text" formControlName="full_name"
+            placeholder="Jean Dupont"
             class="w-full bg-[#1e2e30] border border-[#416F6F]/50 rounded-xl px-4 py-3 text-white placeholder:text-[#628276] focus:outline-none focus:ring-2 focus:ring-[#FFD195]/40 focus:border-[#FFD195]/60 transition-all" />
         </div>
 
-        <button type="submit" [disabled]="loading"
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] uppercase tracking-wider font-semibold text-[#9D9E81]">Mot de passe</label>
+          <input type="password" formControlName="password"
+            placeholder="••••••••"
+            class="w-full bg-[#1e2e30] border border-[#416F6F]/50 rounded-xl px-4 py-3 text-white placeholder:text-[#628276] focus:outline-none focus:ring-2 focus:ring-[#FFD195]/40 focus:border-[#FFD195]/60 transition-all" />
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-[11px] uppercase tracking-wider font-semibold text-[#9D9E81]">Confirmer votre mot de passe</label>
+          <input type="password" formControlName="confirmPassword"
+            placeholder="••••••••"
+            class="w-full bg-[#1e2e30] border border-[#416F6F]/50 rounded-xl px-4 py-3 text-white placeholder:text-[#628276] focus:outline-none focus:ring-2 focus:ring-[#FFD195]/40 focus:border-[#FFD195]/60 transition-all" />
+        </div>
+
+        <button type="submit"
           class="w-full py-3.5 bg-[#3E5153] hover:bg-[#416F6F] text-white font-bold rounded-xl shadow-lg shadow-[#3E5153]/40 transition-all active:scale-[0.98] disabled:opacity-50 mt-2">
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
+          S'inscrire !
         </button>
+        <p class="mt-4 text-center text-sm text-[#9D9E81]">
+        Déjà inscrit ? <a routerLink="/login" class="text-[#FFD195] hover:underline">Se connecter</a>
+      </p>
 
       </form>
 
       @if (errorMessage) {
       <p class="mt-4 text-center text-sm text-red-400">{{ errorMessage }}</p>
       }
-      <p class="mt-4 text-center text-sm text-[#9D9E81]">
-        Pas encore de compte ? <a routerLink="/register" class="text-[#FFD195] hover:underline">S'inscrire</a>
-      </p>
 
     </div>
-
   </div>
 
 </div>

@@ -1,206 +1,168 @@
-<div class=" grid grid-cols-1 pt-5">
-    <div class="bg-gray-800/50 rounded-lg border border-gray-900 p-4 mb-2">
-        <h3 class="text-sm text-center font-semibold text-gray-300 uppercase tracking-wider">Vos demandes</h3>
+<div class="grid grid-cols-1 pt-5">
+    <div class="bg-[#3E5153] rounded-lg p-4 mb-2">
+        <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">Vos demandes</h3>
     </div>
 
-    <div class="grid grid-cols-1 gap-0.5 ">
+    <div class="grid grid-cols-1 gap-2">
         @for (intervention of interventionsAssigned; track intervention.id) {
-        <div class="bg-gray-900 border border-gray-500 rounded-xl p-4 hover:bg-gray-800/70 transition-colors cursor-pointer"
+        <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+            [ngClass]="expandedId === intervention.id
+                ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
+                : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
             (click)="toggleDetails(intervention.id)">
-            <div class="grid grid-cols-2 items-center text-center ">
-                <div>
-                    <p class="text-white font-semibold mb-1">{{ intervention.title }}</p>
-                </div>
-                <div>
-                    <span class="text-sm text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
-                </div>
+            <div class="grid grid-cols-2 items-center text-center">
+                <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
+                <span class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
             </div>
-
         </div>
-        <div class="grid transition-all duration-900"
+        <div class="grid transition-all duration-300"
             [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-            <div class="w-full  overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
-                <div
-                    class="bg-gray-50 dark:bg-gray-800 px-4 py-3.5 flex items-center border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-normal text-gray-500 dark:text-gray-400">Détails de l'intervention</h3>
+            <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+                <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+                    <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
                 </div>
-                <div class="bg-white dark:bg-gray-900 p-6 space-y-4 text-sm grid grid-cols-2">
-                    <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                        <span class="text-slate-500 font-medium">Titre</span>
-                        <span class="text-base font-semibold text-slate-100">{{ intervention.title }}</span>
+                <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
+                    <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                        <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                        <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
                     </div>
-                    <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                        <span class="text-slate-500 font-medium">Lieu</span>
-                        <span class="text-base text-slate-100">{{ intervention.location }}</span>
+                    <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                        <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                        <span class="text-[#3E5153]">{{ intervention.location }}</span>
                     </div>
-                    <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                        <span class="text-slate-500 font-medium">Date de création</span>
-                        <span class="font-mono text-slate-100">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
+                    <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                        <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de création</span>
+                        <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
                     </div>
-                    <div class="flex flex-col pb-2">
-                        <span class="text-slate-500 font-medium mb-1">Statut</span>
+                    <div class="flex flex-col pb-3">
+                        <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
                         <span [ngClass]="getStatusClass(intervention.status).cssClass"
                             class="inline-block w-fit px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
                             {{ getStatusClass(intervention.status).label }}
                         </span>
                     </div>
-
-
-                    <div class="flex justify-center">
-                        <button class="btn-primary" (click)="processingIntervention(intervention.id)">Prendre en
-                            charge</button>
+                    <div class="flex justify-center pt-2">
+                        <button class="btn-primary" (click)="processingIntervention(intervention.id)">Prendre en charge</button>
                     </div>
-                    <div class="flex justify-center">
-                        <button class="btn-alert"
-                            (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un
-                            problème</button>
+                    <div class="flex justify-center pt-2">
+                        <button class="btn-alert" (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un problème</button>
                     </div>
                 </div>
-
             </div>
         </div>
         }
-
     </div>
+
     @if (interventionsAssigned.length === 0) {
-    <div class="text-center py-12 text-gray-500">
-        <p class="text-lg">Aucune demande assignées pour le moment.</p>
+    <div class="text-center py-12 text-[#628276]">
+        <p class="text-lg">Aucune demande assignée pour le moment.</p>
     </div>
     }
 
-
-    <div class="grid grid-cols-1 gap-0.5 pt-10">
-        <div class="bg-gray-800/50 rounded-lg border border-gray-900 p-4 mb-2 ">
-            <h3 class="text-sm text-center font-semibold text-gray-300 uppercase tracking-wider ">Demandes en cours de
-                traitement:</h3>
+    <div class="grid grid-cols-1 gap-2 pt-10">
+        <div class="bg-[#3E5153] rounded-lg p-4 mb-2">
+            <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">Demandes en cours de traitement</h3>
         </div>
-        <div class="grid grid-cols-1">
+        <div class="grid grid-cols-1 gap-2">
             @for (intervention of interventionsProcessing; track intervention.id) {
-            <div class="bg-gray-900 border border-gray-500 rounded-xl p-4 hover:bg-gray-800/70 transition-colors cursor-pointer"
+            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+                [ngClass]="expandedId === intervention.id
+                    ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
+                    : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
                 (click)="toggleDetails(intervention.id)">
-
                 <div class="grid grid-cols-2 items-center text-center">
-                    <div>
-                        <p class="text-white font-semibold mb-1 ">{{ intervention.title }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
-                    </div>
-
+                    <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
+                    <p class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
                 </div>
-
-
-
             </div>
-            <div class="grid transition-all duration-900"
+            <div class="grid transition-all duration-300"
                 [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                <div class="w-full overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div
-                        class="bg-gray-50 dark:bg-gray-800 px-4 py-3.5 flex items-center border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm font-normal text-gray-500 dark:text-gray-400">Détails de l'intervention</h3>
+                <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+                    <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+                        <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
                     </div>
-                    <div class="bg-white dark:bg-gray-900 p-6 space-y-4 text-sm grid grid-cols-2 items-center">
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Titre</span>
-                            <span class="text-base font-semibold text-slate-100">{{ intervention.title }}</span>
+                    <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4 items-center">
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                            <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
                         </div>
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Lieu</span>
-                            <span class="text-base text-slate-100">{{ intervention.location }}</span>
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                            <span class="text-[#3E5153]">{{ intervention.location }}</span>
                         </div>
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Date de création</span>
-                            <span class="font-mono text-slate-100">{{ intervention.created_at | date:"dd/MM/yyyy"
-                                }}</span>
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de création</span>
+                            <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
                         </div>
-                        <div class="flex flex-col pb-2">
-                            <span class="text-slate-500 font-medium mb-1">Statut</span>
+                        <div class="flex flex-col pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
                             <span [ngClass]="getStatusClass(intervention.status).cssClass"
                                 class="inline-block w-fit px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                 {{ getStatusClass(intervention.status).label }}
                             </span>
                         </div>
-
-                        <div class="flex justify-center">
-                            <button class="btn-success"
-                                (click)="closeIntervention(intervention.id); $event.stopPropagation()">Cloturer</button>
+                        <div class="flex justify-center pt-2">
+                            <button class="btn-success" (click)="closeIntervention(intervention.id); $event.stopPropagation()">Clôturer</button>
                         </div>
-                        <div class="flex justify-center">
-                            <button class="btn-alert"
-                                (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un
-                                problème</button>
+                        <div class="flex justify-center pt-2">
+                            <button class="btn-alert" (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un problème</button>
                         </div>
                     </div>
-
-
                 </div>
             </div>
             }
         </div>
     </div>
+
     @if (interventionsProcessing.length === 0) {
-    <div class="text-center py-12 text-gray-500">
+    <div class="text-center py-12 text-[#628276]">
         <p class="text-lg">Aucune demande en cours de traitement.</p>
     </div>
     }
 
-
-
-
-    <div class="grid grid-cols-1 gap-0.5 pt-10">
-
-        <div class="bg-gray-800/50 rounded-lg border border-gray-900 p-4 mb-2">
-            <h3 class="text-sm text-center font-semibold text-gray-300 uppercase tracking-wider ">Demandes cloturées
-            </h3>
+    <div class="grid grid-cols-1 gap-2 pt-10">
+        <div class="bg-[#3E5153] rounded-lg p-4 mb-2">
+            <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">Demandes clôturées</h3>
         </div>
-        <div class="grid grid-cols-1">
+        <div class="grid grid-cols-1 gap-2">
             @for (intervention of interventionsClosed; track intervention.id) {
-            <div class="bg-gray-900 border border-gray-500 rounded-xl p-4 hover:bg-gray-800/70 transition-colors cursor-pointer"
+            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+                [ngClass]="expandedId === intervention.id
+                    ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
+                    : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
                 (click)="toggleDetails(intervention.id)">
                 <div class="grid grid-cols-2 items-center text-center">
-                    <div>
-                        <p class="text-white font-semibold mb-1 ">{{ intervention.title }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
-                    </div>
-
-
+                    <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
+                    <p class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
                 </div>
             </div>
-            <div class="grid transition-all duration-900"
+            <div class="grid transition-all duration-300"
                 [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                <div class="w-full overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div
-                        class="bg-gray-50 dark:bg-gray-800 px-4 py-3.5 flex items-center border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm font-normal text-gray-500 dark:text-gray-400">Détails de l'intervention</h3>
+                <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+                    <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+                        <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
                     </div>
-                    <div class="bg-white dark:bg-gray-900 p-6 space-y-4 text-sm grid grid-cols-2 items-center">
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Titre</span>
-                            <span class="text-base font-semibold text-slate-100">{{ intervention.title }}</span>
+                    <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4 items-center">
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                            <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
                         </div>
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Lieu</span>
-                            <span class="text-base text-slate-100">{{ intervention.location }}</span>
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                            <span class="text-[#3E5153]">{{ intervention.location }}</span>
                         </div>
-                        <div class="flex flex-col border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <span class="text-slate-500 font-medium">Date de création</span>
-                            <span class="font-mono text-slate-100">{{ intervention.created_at | date:"dd/MM/yyyy"
-                                }}</span>
+                        <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de création</span>
+                            <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
                         </div>
-                        <div class="flex flex-col pb-2">
-                            <span class="text-slate-500 font-medium mb-1">Statut</span>
+                        <div class="flex flex-col pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
                             <span [ngClass]="getStatusClass(intervention.status).cssClass"
                                 class="inline-block w-fit px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
                                 {{ getStatusClass(intervention.status).label }}
                             </span>
                         </div>
-
-
                     </div>
-
-
                 </div>
             </div>
             }

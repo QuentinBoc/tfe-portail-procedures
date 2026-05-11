@@ -12,21 +12,17 @@ def get_user_by_email(db, email: str):
 def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
-def create_user(db: Session, email: str, full_name: str, password: str, role_name: str):
+def create_user(db: Session, email: str, full_name: str, password: str):
     email = email.strip().lower()
     existing = get_user_by_email(db, email)
     if existing:
         raise ValueError("email existe déjà")
     
-    role = db.query(Role).filter(Role.label == role_name).first()
-    if not role:
-        raise ValueError("role inconnu")
     
     new_user = User(
         email=email,
         full_name=full_name.strip(),
         password_hash= hash_password(password),
-        role_id=role.id,
     )
 
     db.add(new_user)

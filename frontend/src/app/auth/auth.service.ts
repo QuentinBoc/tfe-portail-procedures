@@ -39,6 +39,13 @@ export class AuthService {
     localStorage.removeItem('access_token');
     this.router.navigate(['login']);
   }
+
+  register(email: string, full_name: string, password: string): Observable<User>{
+    return this.http
+    .post<User>(`${this.apiURL}/users/register`,
+      {email, full_name, password}
+    )
+  }
 }
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
