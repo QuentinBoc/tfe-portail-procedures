@@ -5,27 +5,46 @@
         <span class="header-title header-title-short">Portail AR Comines</span>
         <span class="header-title header-title-full">Portail Athénée Royal Comines</span>
 
-        <div class="header-user grid grid-cols-2 gap-2">
+        <div class="header-user flex items-center gap-6">
 
-            <div class="relative" (click)="onBellClick()">
-                <svg  class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 20 21">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C17 15.4 17 16 16.462 16H3.538C3 16 3 15.4 3 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 10 3.464ZM1.866 8.832a8.458 8.458 0 0 1 2.252-5.714m14.016 5.714a8.458 8.458 0 0 0-2.252-5.714M6.54 16a3.48 3.48 0 0 0 6.92 0H6.54Z" />
-                </svg>
-                @if (unreadCount > 0){
-                <span class="absolute top-0 right-0 flex items-center justify-center h-4 w-4 
+            <div class="relative inline-block">
+                <div class="cursor-pointer" (click)="onBellClick()">
+                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 21">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 3.464V1.1m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175C17 15.4 17 16 16.462 16H3.538C3 16 3 15.4 3 14.807c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 10 3.464ZM1.866 8.832a8.458 8.458 0 0 1 2.252-5.714m14.016 5.714a8.458 8.458 0 0 0-2.252-5.714M6.54 16a3.48 3.48 0 0 0 6.92 0H6.54Z" />
+                    </svg>
+                    @if (unreadCount > 0){
+                    <span class="absolute top-0 right-0 flex items-center justify-center h-4 w-4 
            -translate-y-1/2 translate-x-1/2
            bg-red-500 text-white text-[10px] font-bold rounded-full 
            border-2 border-white">
-                    {{ unreadCount }}
-                </span>
-                }
+                        {{ unreadCount }}
+                    </span>
+                    }
+                </div>
+                
+
+                    <div [class.invisible]="!isDropdownOpen" [class.opacity-0]="!isDropdownOpen"
+                        [class.scale-95]="!isDropdownOpen" [class.opacity-100]="isDropdownOpen"
+                        [class.scale-100]="isDropdownOpen"
+                        class="absolute right-0 mt-2 w-64 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 transition-all duration-200 ease-out origin-top-right transform">
+                        @if (unreadCount > 0) {
+                        <p class="text-sm text-gray-700 dark:text-gray-200">
+                            <strong>{{ unreadCount }}</strong> nouvelle(s) intervention(s) en attente.
+                        </p>
+                        } @else {
+                        <p class="text-sm text-center text-gray-500 italic">
+                            Il n'y a aucune notification.
+                        </p>
+                        }
+                    </div>
             </div>
 
-            <div class="user-chip">
-                <div class="user-avatar">{{ roleLabel?.charAt(0) }}</div>
-                <span class="user-role">{{ roleLabel }}</span>
+            <div class="user-chip flex items-center gap-2">
+                <div class="user-avatar h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">{{
+                    roleLabel?.charAt(0) }}</div>
+                <span class="user-role whitespace-nowrap">{{ roleLabel }}</span>
             </div>
         </div>
     </header>

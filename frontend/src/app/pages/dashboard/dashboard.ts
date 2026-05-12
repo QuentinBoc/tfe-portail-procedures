@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { NotificationModel } from '../interfaces/notification.model';
 
 
+
 type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
 
 @Component({
@@ -17,6 +18,7 @@ type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
   imports: [CommonModule, RequesterPanel, AdminPanel, ValidatorPanel, SupervisorPanel, TechnicianPanel],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
+
 })
 export class Dashboard implements OnInit {
   role: RoleName | null = null;
@@ -24,6 +26,7 @@ export class Dashboard implements OnInit {
   ActivePanel: any = null;
   isExpanded: boolean = false;
   notifications: NotificationModel[] = [];
+  isDropdownOpen: boolean = false;
 
   toggleSidebar(): void {
     this.isExpanded = !this.isExpanded
@@ -41,7 +44,7 @@ export class Dashboard implements OnInit {
     private auth: AuthService,
     private notificationService: NotificationService
   ) { }
-  
+
 
   ngOnInit(): void {
     this.auth.me().subscribe({
@@ -67,21 +70,33 @@ export class Dashboard implements OnInit {
   }
 
 
-  logout(): void{
+  logout(): void {
     this.auth.logout()
   }
 
   onBellClick(): void {
-    this.notificationService.checkNotifications().subscribe({
-      next: () => {
-        this.notificationService.getNotifications().subscribe({
-          next: (data) => {
-            this.notifications = data;
+    if (!this.isDropdownOpen) {
+      this.isDropdownOpen = true
+      setTimeout(() => {
+        this.notificationService.checkNotifications().subscribe({
+          next: () => {
+            this.isDropdownOpen = false,
+              this.notificationService.getNotifications().subscribe({
+                next: (data) => {
+                  this.notifications = data;
+                }
+              })
           }
-        });
-      }
-    });
+
+        })
+
+
+      }, 3000)
+    }
+
   }
+
+
 
 }
 
