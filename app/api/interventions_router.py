@@ -8,6 +8,7 @@ from app.core.security import get_current_user
 from app.core.db import get_db
 from app.models.user import User
 from app.models.intervention import Intervention
+from app.services.notification_service import notification_all_users
 
 router = APIRouter(tags=["interventions"])
 
@@ -17,7 +18,7 @@ def add_intervention(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
     ):
-    """Création d'une intervention sur base du schema et de l'utilisateur"""
+    """Création d'une intervention sur base du schema et de l'utilisateur et envoi une notification au validateurs"""
     new_intervention = Intervention(
         title=data.title,
         description=data.description,
@@ -28,6 +29,7 @@ def add_intervention(
     db.add(new_intervention)
     db.commit()
     db.refresh(new_intervention)
+    notification_all_users(db= db, role_id= 4, message= "Vous avez une nouvelle intervention en attente de validation", intervention_id= new_intervention.id)
     return new_intervention
 
 @router.get("/mine", response_model=list[InterventionOut])
@@ -157,7 +159,7 @@ def validate_intervention(
     current_user: User = Depends(require_min_level(4)),
     db: Session = Depends(get_db),
 ):
-    """Modifie le statut de l'intervention de En attente vers Validé"""
+    """Modifie le statut de l'intervention de En attente vers Validé et notifie les chefs"""
     intervention = db.query(Intervention).filter(Intervention.id == id).first()
     if intervention is None:
         raise HTTPException(status_code=404, detail="Intervention introuvable")
@@ -169,6 +171,7 @@ def validate_intervention(
 
     db.commit()
     db.refresh(intervention)
+    notification_all_users(db= db, role_id= 3,message= "Vous avez une nouvelle intervention en attente d'assignation", intervention_id= intervention.id )
 
     return intervention
 

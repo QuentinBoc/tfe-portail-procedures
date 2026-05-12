@@ -71,3 +71,12 @@ class UserOut(BaseModel):
     email: str
     
     model_config = ConfigDict(from_attributes=True)
+
+class NotificationOut(BaseModel):
+    id: int
+    message: str
+    is_read: bool
+    intervention_id: int
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True) 

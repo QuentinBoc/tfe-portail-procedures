@@ -1,3 +1,4 @@
+import { NotificationService } from './../../services/notification.service';
 import { AuthService } from './../../auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { AdminPanel } from './panels/admin-panel/admin-panel';
@@ -6,6 +7,8 @@ import { TechnicianPanel } from './panels/technician-panel/technician-panel';
 import { SupervisorPanel } from './panels/supervisor-panel/supervisor-panel';
 import { RequesterPanel } from './panels/requester-panel/requester-panel';
 import { CommonModule } from '@angular/common';
+import { NotificationModel } from '../interfaces/notification.model';
+
 
 type RoleName = 'Admin' | 'Direction' | 'Technicien' | 'Chef' | 'Utilisateur';
 
@@ -20,6 +23,7 @@ export class Dashboard implements OnInit {
   roleLabel: string | null = null;
   ActivePanel: any = null;
   isExpanded: boolean = false;
+  notifications: NotificationModel[] = [];
 
   toggleSidebar(): void {
     this.isExpanded = !this.isExpanded
@@ -33,7 +37,11 @@ export class Dashboard implements OnInit {
     Utilisateur: RequesterPanel,
   };
 
-  constructor(private auth: AuthService) { }
+  constructor(
+    private auth: AuthService,
+    private notificationService: NotificationService
+  ) { }
+  
 
   ngOnInit(): void {
     this.auth.me().subscribe({
@@ -47,10 +55,32 @@ export class Dashboard implements OnInit {
         this.ActivePanel = null;
       }
     })
+    this.notificationService.getNotifications().subscribe({
+      next: (data: any) => {
+        this.notifications = data;
+      }
+    })
   }
+
+  get unreadCount(): number {
+    return this.notifications.filter(n => !n.is_read).length
+  }
+
 
   logout(): void{
     this.auth.logout()
+  }
+
+  onBellClick(): void {
+    this.notificationService.checkNotifications().subscribe({
+      next: () => {
+        this.notificationService.getNotifications().subscribe({
+          next: (data) => {
+            this.notifications = data;
+          }
+        });
+      }
+    });
   }
 
 }
