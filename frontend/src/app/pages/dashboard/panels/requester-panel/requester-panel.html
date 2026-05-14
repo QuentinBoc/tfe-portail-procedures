@@ -34,25 +34,26 @@
         <textarea formControlName="description"
           class="w-full bg-[#FCEED7]/40 border border-[#9D9E81] rounded-xl px-4 py-2.5 text-sm text-[#3E5153] placeholder-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F]/50 focus:border-[#416F6F] transition-all"
           placeholder="Décrivez le problème..." rows="3"></textarea>
+        @if (form.get('description')?.invalid && form.get('description')?.touched) {
+        <small class="text-red-500 text-[10px] italic">
+          @if (form.get('description')?.errors?.['required']) { La description est obligatoire. }
+        </small>
+        }
       </div>
-      @if (form.get('description')?.invalid && form.get('description')?.touched) {
-      <small class="text-red-500 text-[10px] italic">
-        @if (form.get('description')?.errors?.['required']) { La description est obligatoire. }
-      </small>
-      }
+
       <div class="grid grid-cols-2 gap-4">
         <div class="flex flex-col gap-1.5">
           <label class="text-xs uppercase tracking-wider font-semibold text-[#628276]">Localisation</label>
           <input type="text" formControlName="location"
             class="w-full bg-[#FCEED7]/40 border border-[#9D9E81] rounded-xl px-4 py-2.5 text-sm text-[#3E5153] placeholder-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F]/50 focus:border-[#416F6F] transition-all"
             placeholder="Ex: Salle 12" />
-        
-        @if (form.get('location')?.invalid && form.get('location')?.touched) {
-        <small class="text-red-500 text-[10px] italic">
-          @if (form.get('location')?.errors?.['required']) { Le lieu est obligatoire. }
-        </small>
-      }
-      </div>
+
+          @if (form.get('location')?.invalid && form.get('location')?.touched) {
+          <small class="text-red-500 text-[10px] italic">
+            @if (form.get('location')?.errors?.['required']) { Le lieu est obligatoire. }
+          </small>
+          }
+        </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-xs uppercase tracking-wider font-semibold text-[#628276]">Type</label>
           <select formControlName="type"
@@ -68,8 +69,8 @@
           Annuler
         </button>
         <button [disabled]="form.invalid" type="submit"
-          class="flex-1 py-3 px-4 text-white font-semibold rounded-xl transition-colors duration-200 shadow-lg"
-          style="background:#3E5153" onmouseover="this.style.background='#416F6F'"
+          class="flex-1 py-3 px-4 text-white font-semibold rounded-xl transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          style="background:#3E5153" onmouseover ="this.style.background='#416F6F'"
           onmouseout="this.style.background='#3E5153'">
           Envoyer
         </button>

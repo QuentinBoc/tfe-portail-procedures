@@ -7,10 +7,10 @@ class LoginRequest(BaseModel):
     password: str
 
 class InterventionCreate(BaseModel):
-    title: str
-    description: str
-    location: str
-    type: str
+    title: str = Field(min_length=1, strip_whitespace=True)
+    description: str = Field(min_length=1, strip_whitespace=True)
+    location: str = Field(min_length=1, strip_whitespace=True)
+    type: str = Field(min_length=1)
 
 class AssignRequest(BaseModel):
     assignee_id: int
