@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { Intervention } from '../../../interfaces/intervention.model';
 import { User } from '../../../interfaces/users.model';
 import { IStatusInfo } from '../../../interfaces/ilabel';
+import { NotificationService } from '../../../../services/notification.service';
+
 
 @Component({
   selector: 'app-supervisor-panel',
@@ -20,17 +22,24 @@ export class SupervisorPanel implements OnInit {
   users: User[] = [];
   selectedUserIds: Record<number, number> = {};
   selectedIntervention: Intervention | null = null;
+  skip: number = 0;
+  limit: number = 5;
 
   constructor(
     private interventionService: InterventionService,
-    private userService: UserService
+    private userService: UserService,
+    private notificationService: NotificationService,
   ) { }
 
   /** Récupère les interventions validées */
   getValidated(): void {
-    this.interventionService.getValidated().subscribe({
+    this.interventionService.getValidated(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
+       const oldLength = this.interventionsValidate.length
         this.interventionsValidate = data;
+        const newLength = this.interventionsValidate.length
+        if (oldLength !== newLength)
+          this.notificationService.refresh()
       },
       error: (err) => {
         console.error('Erreur', err);
@@ -40,9 +49,13 @@ export class SupervisorPanel implements OnInit {
 
   /** Récupère les interventions assignées */
   getAssigned(): void {
-    this.interventionService.getAssigned().subscribe({
+    this.interventionService.getAssigned(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
+      const oldLength = this.interventionsAssigned.length
         this.interventionsAssigned = data;
+        const newLength = this.interventionsAssigned.length
+        if (oldLength !== newLength)
+          this.notificationService.refresh()
       },
       error: (err) => {
         console.error('Erreur', err);
@@ -125,5 +138,18 @@ export class SupervisorPanel implements OnInit {
       'REJECTED':   'bg-red-500 w-full h-1.5',
     };
     return classes[status] ?? 'bg-yellow-500 w-full h-1.5';
+  }
+
+  previousPage(): void {
+    if (this.skip > 0) {
+      this.skip = (this.skip - this.limit);
+      this.getAssigned();
+    }
+  }
+
+  nextPage(): void {
+    this.skip += this.limit;
+    this.getAssigned();
+
   }
 }

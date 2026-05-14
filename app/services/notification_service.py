@@ -1,3 +1,4 @@
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.models.notification import Notification
@@ -26,4 +27,7 @@ def notification_all_users(db: Session, role_id: int, message: str, intervention
     for user in users_notifications:
         create_notification(db= db, user_id= user.id, message= message, intervention_id= intervention_id)
         
-    
+def check_notification(db: Session, intervention_id: int, user_id: int):
+    notifications = db.query(Notification).filter(Notification.intervention_id == intervention_id, Notification.user_id == user_id, Notification.is_read == False)
+    for notification in notifications:
+        notification.is_read = True

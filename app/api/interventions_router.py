@@ -8,7 +8,7 @@ from app.core.security import get_current_user
 from app.core.db import get_db
 from app.models.user import User
 from app.models.intervention import Intervention
-from app.services.notification_service import notification_all_users
+from app.services.notification_service import check_notification, notification_all_users
 
 router = APIRouter(tags=["interventions"])
 
@@ -34,6 +34,8 @@ def add_intervention(
 
 @router.get("/mine", response_model=list[InterventionOut])
 def get_my_interventions(
+    skip: int = 0,
+    limit: int = 5,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)):
     """Récupère les interventions selon l'utilisateur connecté"""
@@ -41,24 +43,32 @@ def get_my_interventions(
         db.query(Intervention)
         .filter(Intervention.created_by == current_user.id)
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
     return interventions
 
 @router.get("/all", response_model=list[InterventionOut])
 def get_all_interventions(
+    skip: int = 0,
+    limit: int = 5,
     current_user: User = Depends(require_min_level(5)),
     db: Session = Depends(get_db)):
     """Récupère toutes les interventions selon le role de l'utilisateur"""
     interventions = (
         db.query(Intervention)
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
     return interventions
 
 @router.get("/pending", response_model=list[InterventionOut],)
 def get_pending_interventions(
+    skip: int = 0,
+    limit: int = 5,
     _current_user: User = Depends(require_min_level(4)),
     db: Session = Depends(get_db)):
     """Récupère les interventions en attentes"""
@@ -66,6 +76,8 @@ def get_pending_interventions(
         db.query(Intervention)
         .filter(Intervention.status == "PENDING")
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
      )
     return interventions
@@ -73,20 +85,26 @@ def get_pending_interventions(
 
 @router.get("/assigned", response_model=list[InterventionOut])
 def get_assigned_interventions(
+    skip: int = 0,
+    limit: int = 5,
     current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
     """Récupère les interventions assignées"""
-    query = db.query(Intervention).filter(Intervention.status == "ASSIGNED")
-
-    if current_user.role_id < 3:
-        query = query.filter(Intervention.assigned_to == current_user.id)
-
-    interventions = query.order_by(Intervention.created_at.desc()).all()
+    interventions = (
+        db.query(Intervention)
+        .filter(Intervention.status == "ASSIGNED")
+        .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+     )
     return interventions
     
 
 @router.get("/validated", response_model=list[InterventionOut],)
 def get_validated_interventions(
+    skip: int = 0,
+    limit: int = 5,
     _current_user: User = Depends(require_min_level(3)),
     db: Session = Depends(get_db)):
     """Récupère les interventions validées"""
@@ -94,12 +112,16 @@ def get_validated_interventions(
         db.query(Intervention)
         .filter(Intervention.status == "VALIDATED")
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
      )
     return interventions
 
 @router.get("/processing", response_model=list[InterventionOut],)
 def get_processing_interventions(
+    skip: int = 0,
+    limit: int = 5,
     _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
     """Récupère les interventions en cours de traitements"""
@@ -107,12 +129,16 @@ def get_processing_interventions(
         db.query(Intervention)
         .filter(Intervention.status == "PROCESSING")
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
      )
     return interventions
 
 @router.get("/closed", response_model=list[InterventionOut],)
 def get_closed_interventions(
+    skip: int = 0,
+    limit: int = 5,
     _current_user: User = Depends(require_min_level(2)),
     db: Session = Depends(get_db)):
     """Récupère les interventions fermées"""
@@ -123,6 +149,8 @@ def get_closed_interventions(
             Intervention.assigned_to == _current_user.id
         )
         .order_by(Intervention.created_at.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
      )
     return interventions
@@ -146,10 +174,10 @@ def process_intervention(
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
     
-
+    check_notification(db=db, intervention_id=intervention.id, user_id=current_user.id)
     db.commit()
     db.refresh(intervention)
-
+    notification_all_users(db= db, role_id= 1,message= "Vous avez une nouvelle intervention en attente d'assignation", intervention_id= intervention.id )
     return intervention
 
 
@@ -168,7 +196,7 @@ def validate_intervention(
     intervention.status ="VALIDATED"
     intervention.validated_by = current_user.id
     intervention.validated_at = datetime.now(timezone.utc)
-
+    check_notification(db=db, intervention_id=intervention.id, user_id=current_user.id)
     db.commit()
     db.refresh(intervention)
     notification_all_users(db= db, role_id= 3,message= "Vous avez une nouvelle intervention en attente d'assignation", intervention_id= intervention.id )
@@ -190,7 +218,7 @@ def reject_intervention(
     intervention.status ="REJECTED"
     intervention.rejected_by = current_user.id
     intervention.rejected_at = datetime.now(timezone.utc)
-    
+    check_notification(db=db, intervention_id=intervention.id, user_id=current_user.id)
     db.commit()
     db.refresh(intervention)
     
@@ -213,9 +241,10 @@ def assign_intervention(
         intervention.assigned_at = datetime.now(timezone.utc)
     else:
         raise HTTPException(status_code=403, detail="Vous n'avez pas les permissions requises")
-            
+    check_notification(db=db, intervention_id=intervention.id, user_id=current_user.id)        
     db.commit()
     db.refresh(intervention)
+    notification_all_users(db= db, role_id= 2,message= "Vous avez une nouvelle intervention en attente d'assignation", intervention_id= intervention.id )
     
     return intervention
 

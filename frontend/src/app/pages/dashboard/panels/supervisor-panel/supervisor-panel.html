@@ -10,11 +10,9 @@
     </div>
     <div class="grid grid-cols-1 gap-2">
       @for (intervention of interventionsValidate; track intervention.id) {
-      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
-        [ngClass]="expandedId === intervention.id
+      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
-        (click)="toggleDetails(intervention.id)">
+          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
         <div class="flex items-center justify-between mb-3">
           <div class="inline-block px-3 py-1 text-xs font-semibold rounded-full"
             [ngClass]="getStatusClass(intervention.status).cssClass">
@@ -35,8 +33,7 @@
           </select>
           <button (click)="assign(intervention.id); $event.stopPropagation()"
             class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap shadow-sm"
-            style="background:#3E5153"
-            onmouseover="this.style.background='#416F6F'"
+            style="background:#3E5153" onmouseover="this.style.background='#416F6F'"
             onmouseout="this.style.background='#3E5153'">
             Assigner
           </button>
@@ -57,11 +54,9 @@
     </div>
     <div class="grid grid-cols-1 gap-2">
       @for (intervention of interventionsAssigned; track intervention.id) {
-      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
-        [ngClass]="expandedId === intervention.id
+      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
-        (click)="toggleDetails(intervention.id)">
+          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
         <div class="flex items-center justify-between mb-3">
           <h4 class="text-[#3E5153] font-semibold">{{ intervention.title }}</h4>
           <span class="text-xs text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
@@ -105,6 +100,27 @@
         </div>
       </div>
       }
+      <div class="flex justify-center items-center gap-10 mt-8 mb-10">
+        <button (click)="previousPage()" [disabled]="skip === 0"
+          class="flex items-center gap-2 px-5 py-2 border border-[#9D9E81] text-[#3E5153] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#fdf8f2] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Précédent
+        </button>
+
+        <span class="text-[10px] font-bold text-[#628276] uppercase tracking-[0.2em]">
+          Interventions de {{ skip + 1 }} à {{ skip + interventionsAssigned.length }}
+        </span>
+
+        <button (click)="nextPage()" [disabled]="interventionsAssigned.length < limit"
+          class="flex items-center gap-2 px-5 py-2 bg-[#3E5153] text-[#FFD195] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#4a6163] transition-all shadow-md disabled:opacity-30 disabled:cursor-not-allowed">
+          Suivant
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
       @if (interventionsAssigned.length === 0) {
       <div class="text-center py-8 text-[#628276]">
         <p>Aucune intervention assignée.</p>

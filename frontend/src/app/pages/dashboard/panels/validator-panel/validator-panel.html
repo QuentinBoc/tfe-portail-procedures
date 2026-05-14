@@ -1,4 +1,4 @@
-<div class="p-6 max-w-4xl mx-auto">
+<div class="grid grid-cols-1 pt-5">
 
     <div class="flex justify-between items-center px-6 py-4">
         <h2 class="text-2xl font-extrabold tracking-tight text-[#3E5153]">Demandes en cours</h2>
@@ -14,133 +14,168 @@
         <div class="bg-[#3E5153] rounded-lg p-4 mb-2">
             <h3 class="text-sm font-semibold text-[#FFD195] uppercase tracking-wider">À valider</h3>
         </div>
-        <div class="grid grid-cols-[minmax(325px,1fr)_full] gap-2">
-            @for (intervention of interventions; track intervention.id) {
-            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
+        <div class="flex flex-col">
+            <div class="grid grid-cols-[minmax(325px,1fr)_full] gap-2">
+                @for (intervention of interventions; track intervention.id) {
+                <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
                     ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
                     : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
-                <div class="grid grid-cols-2 items-center justify-between gap-3 mb-3">
-                    <p class="text-[#3E5153] font-semibold text-center">{{ intervention.title }}</p>
-                    <h4 class="text-xs text-[#628276] text-center">{{ intervention.created_at | date:'dd/MM/yyyy' }}
-                    </h4>
-                </div>
-                <div class="grid transition-all duration-300"
-                    [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                    <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
-                        <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
-                            <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
-                        </div>
-                        <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
-                                <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+                    <div class="grid grid-cols-2 items-center justify-between gap-3 mb-3">
+                        <p class="text-[#3E5153] font-semibold text-center">{{ intervention.title }}</p>
+                        <h4 class="text-xs text-[#628276] text-center">{{ intervention.created_at | date:'dd/MM/yyyy' }}
+                        </h4>
+                    </div>
+                    <div class="grid transition-all duration-300"
+                        [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+                        <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+                            <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+                                <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
                             </div>
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
-                                <span class="text-[#3E5153]">{{ intervention.location }}</span>
-                            </div>
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de
-                                    création</span>
-                                <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy"
-                                    }}</span>
-                            </div>
-                            <div class="flex flex-col pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
-                                <span [ngClass]="getStatusClass(intervention.status).cssClass"
-                                    class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                    {{ getStatusClass(intervention.status).label }}
-                                </span>
-                            </div>
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3 col-span-2">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description</span>
-                                <span class="text-[#3E5153]">{{ intervention.description }}</span>
-                            </div>
-                            <button type="button" (click)="validate(intervention.id)"
-                                class="flex-1 border bg-green-200 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition">
-                                Valider
-                            </button>
-                            <button type="button" (click)="reject(intervention.id)"
-                                class="flex-1 bg-red-200 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition">
-                                Annuler
-                            </button>
-                            <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
-                                <span class="text-xs text-[#628276]">Progression</span>
-                                <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
-                                    <div [class]="getProgressWidth(intervention.status)"
-                                        class="h-full rounded-full transition-all duration-500">
+                            <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                                    <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+                                </div>
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                                    <span class="text-[#3E5153]">{{ intervention.location }}</span>
+                                </div>
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date
+                                        de
+                                        création</span>
+                                    <span class="font-mono text-[#3E5153]">{{ intervention.created_at |
+                                        date:"dd/MM/yyyy"
+                                        }}</span>
+                                </div>
+                                <div class="flex flex-col pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
+                                    <span [ngClass]="getStatusClass(intervention.status).cssClass"
+                                        class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                        {{ getStatusClass(intervention.status).label }}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3 col-span-2">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description</span>
+                                    <span class="text-[#3E5153]">{{ intervention.description }}</span>
+                                </div>
+                                <button type="button" (click)="validate(intervention.id)"
+                                    class="flex-1 border bg-green-200 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition">
+                                    Valider
+                                </button>
+                                <button type="button" (click)="reject(intervention.id)"
+                                    class="flex-1 bg-red-200 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition">
+                                    Annuler
+                                </button>
+                                <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
+                                    <span class="text-xs text-[#628276]">Progression</span>
+                                    <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
+                                        <div [class]="getProgressWidth(intervention.status)"
+                                            class="h-full rounded-full transition-all duration-500">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                }
             </div>
-            }
+            
         </div>
 
         <div class="bg-[#3E5153] rounded-lg p-4 mb-2 mt-6">
             <h3 class="text-sm font-semibold text-[#FFD195] uppercase tracking-wider">Interventions validées</h3>
         </div>
-        <div class="grid grid-cols-[minmax(325px,1fr)_full] gap-2">
-            @for (intervention of interventionsValidated; track intervention.id) {
-            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
+        <div class="flex flex-col">
+            <div class="grid grid-cols-[minmax(325px,1fr)_full] gap-2">
+                @for (intervention of interventionsValidated; track intervention.id) {
+                <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
                     ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
                     : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
-                <div class="grid grid-cols-2 items-center justify-between gap-3 mb-3">
-                    <p class="text-[#3E5153] font-semibold text-center">{{ intervention.title }}</p>
-                    <h4 class="text-xs text-[#628276] text-center">{{ intervention.created_at | date:'dd/MM/yyyy' }}
-                    </h4>
-                </div>
-                <div class="grid transition-all duration-300"
-                    [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                    <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
-                        <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
-                            <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
-                        </div>
-                        <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
-                                <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+                    <div class="grid grid-cols-2 items-center justify-between gap-3 mb-3">
+                        <p class="text-[#3E5153] font-semibold text-center">{{ intervention.title }}</p>
+                        <h4 class="text-xs text-[#628276] text-center">{{ intervention.created_at | date:'dd/MM/yyyy' }}
+                        </h4>
+                    </div>
+                    <div class="grid transition-all duration-300"
+                        [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+                        <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+                            <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+                                <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
                             </div>
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
-                                <span class="text-[#3E5153]">{{ intervention.location }}</span>
-                            </div>
-                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de
-                                    création</span>
-                                <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy"
-                                    }}</span>
-                            </div>
-                            <div class="flex flex-col pb-3">
-                                <span
-                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
-                                <span [ngClass]="getStatusClass(intervention.status).cssClass"
-                                    class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                    {{ getStatusClass(intervention.status).label }}
-                                </span>
-                            </div>
+                            <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                                    <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+                                </div>
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                                    <span class="text-[#3E5153]">{{ intervention.location }}</span>
+                                </div>
+                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                    <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date
+                                        de
+                                        création</span>
+                                    <span class="font-mono text-[#3E5153]">{{ intervention.created_at |
+                                        date:"dd/MM/yyyy"
+                                        }}</span>
+                                </div>
+                                <div class="flex flex-col pb-3">
+                                    <span
+                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
+                                    <span [ngClass]="getStatusClass(intervention.status).cssClass"
+                                        class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                        {{ getStatusClass(intervention.status).label }}
+                                    </span>
+                                </div>
 
-                            <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
-                                <span class="text-xs text-[#628276]">Progression</span>
-                                <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
-                                    <div [class]="getProgressWidth(intervention.status)"
-                                        class="h-full rounded-full transition-all duration-500">
+                                <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
+                                    <span class="text-xs text-[#628276]">Progression</span>
+                                    <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
+                                        <div [class]="getProgressWidth(intervention.status)"
+                                            class="h-full rounded-full transition-all duration-500">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+                }
+                <div class="flex justify-center items-center gap-10 mt-8 mb-10">
+                    <button (click)="previousPage()" [disabled]="skip === 0"
+                        class="flex items-center gap-2 px-5 py-2 border border-[#9D9E81] text-[#3E5153] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#fdf8f2] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Précédent
+                    </button>
+
+                    <span class="text-[10px] font-bold text-[#628276] uppercase tracking-[0.2em]">
+                        Interventions de {{ skip + 1 }} à {{ skip + interventionsValidated.length }}
+                    </span>
+
+                    <button (click)="nextPage()" [disabled]="interventionsValidated.length < limit"
+                        class="flex items-center gap-2 px-5 py-2 bg-[#3E5153] text-[#FFD195] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#4a6163] transition-all shadow-md disabled:opacity-30 disabled:cursor-not-allowed">
+                        Suivant
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            }
+
         </div>
     </div>
 </div>

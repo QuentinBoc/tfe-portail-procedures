@@ -160,13 +160,18 @@
   background-color: #3E5153;
   border-bottom: 2px solid #e2e8f0;
   color: #3E5153;
+  position: relative;
 }
 
 .header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-39%);
   font-weight: bold;
   font-size: 18px;
   color: #ffffff;
-  text-align: left;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .header-title-full {
@@ -176,6 +181,8 @@
 @media (min-width: 1024px) {
   .header-title-short {
     display: none;
+    
+    
   }
   .header-title-full {
     display: inline;

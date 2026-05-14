@@ -1,12 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Intervention } from "../pages/interfaces/intervention.model";
+import { Observable } from "rxjs";
 
 @Injectable({
   providedIn: 'root',
 })
 export class InterventionService {
   private apiURL = 'http://127.0.0.1:8000/api/v1/interventions';
+  
 
   constructor(private http: HttpClient) { }
 
@@ -42,24 +44,24 @@ export class InterventionService {
     return this.http.get<Intervention[]>(`${this.apiURL}/pending`);
   }
 
-  getValidated() {
-    return this.http.get<Intervention[]>(`${this.apiURL}/validated`);
+  getValidated(skip: number, limit: number): Observable<Intervention[]> {
+    return this.http.get<Intervention[]>(`${this.apiURL}/validated?skip=${skip}&limit=${limit}`);
   }
 
   processingIntervention(id: number) {
     return this.http.patch<Intervention>(`${this.apiURL}/${id}/processing`, {});
   }
 
-  getAssigned() {
-    return this.http.get<Intervention[]>(`${this.apiURL}/assigned`);
+  getAssigned(skip: number, limit: number): Observable<Intervention[]> {
+    return this.http.get<Intervention[]>(`${this.apiURL}/assigned?skip=${skip}&limit=${limit}`);
   }
 
   getProcessing() {
     return this.http.get<Intervention[]>(`${this.apiURL}/processing`);
   }
 
-  getClosed() {
-    return this.http.get<Intervention[]>(`${this.apiURL}/closed`);
+  getClosed(skip: number, limit: number): Observable<Intervention[]> {
+    return this.http.get<Intervention[]>(`${this.apiURL}/closed?skip=${skip}&limit=${limit}`);
   }
   
 }

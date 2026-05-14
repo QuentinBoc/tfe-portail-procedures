@@ -1,3 +1,4 @@
+import { NotificationModel } from './../interfaces/notification.model';
 import { NotificationService } from './../../services/notification.service';
 import { AuthService } from './../../auth/auth.service';
 import { Component, OnInit } from '@angular/core';
@@ -7,7 +8,7 @@ import { TechnicianPanel } from './panels/technician-panel/technician-panel';
 import { SupervisorPanel } from './panels/supervisor-panel/supervisor-panel';
 import { RequesterPanel } from './panels/requester-panel/requester-panel';
 import { CommonModule } from '@angular/common';
-import { NotificationModel } from '../interfaces/notification.model';
+
 
 
 
@@ -58,11 +59,12 @@ export class Dashboard implements OnInit {
         this.ActivePanel = null;
       }
     })
-    this.notificationService.getNotifications().subscribe({
-      next: (data: any) => {
-        this.notifications = data;
-      }
+    this.notificationService.notifications$.subscribe({
+      next: (data: NotificationModel[]) => {
+        this.notifications = data
+      },
     })
+    this.notificationService.refresh()
   }
 
   get unreadCount(): number {
@@ -81,11 +83,7 @@ export class Dashboard implements OnInit {
         this.notificationService.checkNotifications().subscribe({
           next: () => {
             this.isDropdownOpen = false,
-              this.notificationService.getNotifications().subscribe({
-                next: (data) => {
-                  this.notifications = data;
-                }
-              })
+              this.notificationService.refresh()
           }
 
         })
