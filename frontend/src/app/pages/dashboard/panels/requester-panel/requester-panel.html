@@ -2,8 +2,7 @@
 <div class="flex justify-between items-center px-6 py-4">
   <button (click)="openModal()"
     class="inline-flex items-center justify-center px-5 py-2.5 text-white text-sm font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-200"
-    style="background:#3E5153"
-    onmouseover="this.style.background='#416F6F'"
+    style="background:#3E5153" onmouseover="this.style.background='#416F6F'"
     onmouseout="this.style.background='#3E5153'">
     + Nouvelle demande
   </button>
@@ -23,6 +22,12 @@
         <input type="text" formControlName="title"
           class="w-full bg-[#FCEED7]/40 border border-[#9D9E81] rounded-xl px-4 py-2.5 text-sm text-[#3E5153] placeholder-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F]/50 focus:border-[#416F6F] transition-all"
           placeholder="Ex: Panne projecteur" />
+        @if (form.get('title')?.invalid && form.get('title')?.touched) {
+        <small class="text-red-500 text-[10px] italic">
+          @if (form.get('title')?.errors?.['required']) { Le titre est obligatoire. }
+          @if (form.get('title')?.errors?.['minlength']) { Minimum 3 caractères. }
+        </small>
+        }
       </div>
       <div class="flex flex-col gap-1.5">
         <label class="text-xs uppercase tracking-wider font-semibold text-[#628276]">Description</label>
@@ -30,13 +35,24 @@
           class="w-full bg-[#FCEED7]/40 border border-[#9D9E81] rounded-xl px-4 py-2.5 text-sm text-[#3E5153] placeholder-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F]/50 focus:border-[#416F6F] transition-all"
           placeholder="Décrivez le problème..." rows="3"></textarea>
       </div>
+      @if (form.get('description')?.invalid && form.get('description')?.touched) {
+      <small class="text-red-500 text-[10px] italic">
+        @if (form.get('description')?.errors?.['required']) { La description est obligatoire. }
+      </small>
+      }
       <div class="grid grid-cols-2 gap-4">
         <div class="flex flex-col gap-1.5">
           <label class="text-xs uppercase tracking-wider font-semibold text-[#628276]">Localisation</label>
           <input type="text" formControlName="location"
             class="w-full bg-[#FCEED7]/40 border border-[#9D9E81] rounded-xl px-4 py-2.5 text-sm text-[#3E5153] placeholder-[#9D9E81] focus:outline-none focus:ring-2 focus:ring-[#416F6F]/50 focus:border-[#416F6F] transition-all"
             placeholder="Ex: Salle 12" />
-        </div>
+        
+        @if (form.get('location')?.invalid && form.get('location')?.touched) {
+        <small class="text-red-500 text-[10px] italic">
+          @if (form.get('location')?.errors?.['required']) { Le lieu est obligatoire. }
+        </small>
+      }
+      </div>
         <div class="flex flex-col gap-1.5">
           <label class="text-xs uppercase tracking-wider font-semibold text-[#628276]">Type</label>
           <select formControlName="type"
@@ -51,10 +67,9 @@
           class="flex-1 py-3 px-4 border border-[#9D9E81] text-[#628276] font-semibold rounded-xl hover:bg-[#FCEED7]/50 transition-colors duration-200">
           Annuler
         </button>
-        <button type="submit"
+        <button [disabled]="form.invalid" type="submit"
           class="flex-1 py-3 px-4 text-white font-semibold rounded-xl transition-colors duration-200 shadow-lg"
-          style="background:#3E5153"
-          onmouseover="this.style.background='#416F6F'"
+          style="background:#3E5153" onmouseover="this.style.background='#416F6F'"
           onmouseout="this.style.background='#3E5153'">
           Envoyer
         </button>
@@ -68,7 +83,8 @@
 <div class="flex flex-col lg:flex-row gap-4 px-4 lg:px-6">
   <div class="flex-1">
     <div class="bg-[#3E5153] rounded-lg p-4 mb-2">
-      <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">Mes demandes d'interventions</h3>
+      <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">Mes demandes d'interventions
+      </h3>
     </div>
 
     @if (interventions.length === 0) {
@@ -80,11 +96,9 @@
 
     <div class="grid grid-cols-1 gap-2">
       @for (intervention of interventions; track intervention.id) {
-      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
-        [ngClass]="expandedId === intervention.id
+      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'"
-        (click)="toggleDetails(intervention.id)">
+          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
         <div class="flex items-center justify-between mb-3">
           <div class="inline-block px-3 py-1 text-xs font-semibold rounded-full"
             [ngClass]="getStatusClass(intervention.status).cssClass">
@@ -101,7 +115,8 @@
               class="h-full rounded-full transition-all duration-500 relative">
               @if (intervention.status === 'CLOSED') {
               <div class="absolute -right-3 -top-3 bg-white border border-[#9D9E81]/40 rounded-full p-1 shadow-md z-10">
-                <svg class="w-4 h-4 text-emerald-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 21">
+                <svg class="w-4 h-4 text-emerald-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 21 21">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="m6.072 10.072 2 2 6-4m3.586 4.314.9-.9a2 2 0 0 0 0-2.828l-.9-.9a2 2 0 0 1-.586-1.414V5.072a2 2 0 0 0-2-2H13.8a2 2 0 0 1-1.414-.586l-.9-.9a2 2 0 0 0-2.828 0l-.9.9a2 2 0 0 1-1.414.586H5.072a2 2 0 0 0-2 2v1.272a2 2 0 0 1-.586 1.414l-.9.9a2 2 0 0 0 0 2.828l.9.9a2 2 0 0 1 .586 1.414v1.272a2 2 0 0 0 2 2h1.272a2 2 0 0 1 1.414.586l.9.9a2 2 0 0 0 2.828 0l.9-.9a2 2 0 0 1 1.414-.586h1.272a2 2 0 0 0 2-2V13.8a2 2 0 0 1 .586-1.414Z" />
                 </svg>

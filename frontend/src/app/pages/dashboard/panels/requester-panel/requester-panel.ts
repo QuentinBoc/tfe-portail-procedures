@@ -2,7 +2,7 @@ import { Intervention } from './../../../interfaces/intervention.model';
 import { IStatusInfo } from './../../../interfaces/ilabel';
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -25,10 +25,10 @@ export class RequesterPanel implements OnInit {
     private fb: FormBuilder
   ) {
     this.form = this.fb.group({
-      title: [''],
-      description: [''],
-      location: [''],
-      type: ['TECHNICAL']
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required]],
+      location: ['', [Validators.required]],
+      type: ['TECHNICAL', [Validators.required]]
     })
   }
 
