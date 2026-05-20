@@ -16,6 +16,7 @@ from app.models.user import User
 from app.models.intervention import Intervention  # import pour que alembic voit le modèle
 from app.models.role import Role
 from app.models.notification import Notification
+from app.api.reports import Report
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

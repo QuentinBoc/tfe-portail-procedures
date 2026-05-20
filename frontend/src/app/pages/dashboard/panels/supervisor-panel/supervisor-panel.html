@@ -39,6 +39,30 @@
           </button>
         </div>
       </div>
+      <div class="grid transition-all duration-300"
+        [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+        <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
+          <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
+            <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
+          </div>
+          <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
+            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+              <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description:</span>
+              <span class="font-semibold text-[#3E5153]">{{ intervention.description }}</span>
+            </div>
+
+
+            <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
+              <span class="text-xs text-[#628276]">Progression</span>
+              <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
+                <div [class]="getProgressWidth(intervention.status)"
+                  class="h-full rounded-full transition-all duration-500">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       }
       @if (interventionsValidate.length === 0) {
       <div class="text-center py-8 text-[#628276]">
@@ -57,11 +81,17 @@
       <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
           : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-[#3E5153] font-semibold">{{ intervention.title }}</h4>
-          <span class="text-xs text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
+        <div class="flex justify-between items-start border-b border-[#9D9E81]/30 pb-3 mb-3">
+          <div class="flex flex-col">
+            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre:</span>
+            <span class="text-[#3E5153] font-semibold">{{ intervention.title }}</span>
+          </div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
         </div>
-        <div class="pt-3 border-t border-[#9D9E81]/30">
+
+        <div class="pt-3 border-[#9D9E81]/30">
           <span class="text-xs text-[#628276]">Progression</span>
           <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
             <div [class]="getProgressWidth(intervention.status)"
@@ -78,17 +108,10 @@
           </div>
           <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
             <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-              <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
-              <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+              <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description</span>
+              <span class="font-semibold text-[#3E5153]">{{ intervention.description}}</span>
             </div>
-            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-              <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
-              <span class="text-[#3E5153]">{{ intervention.location }}</span>
-            </div>
-            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-              <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de création</span>
-              <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy" }}</span>
-            </div>
+
             <div class="flex flex-col pb-3">
               <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
               <span [ngClass]="getStatusClass(intervention.status).cssClass"

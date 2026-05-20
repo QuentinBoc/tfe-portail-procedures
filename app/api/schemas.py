@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict, Field, field_validator
+from app.models.enums import ReportType
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -79,4 +80,22 @@ class NotificationOut(BaseModel):
     intervention_id: int
     created_at: datetime
     
+    model_config = ConfigDict(from_attributes=True) 
+
+class ReportCreate(BaseModel):
+    type: ReportType
+    description: str
+    intervention_id: int
+    
+   
+    
+class ReportResponse(BaseModel):
+    id: int
+    type: ReportType
+    user_id: int
+    description: str
+    created_at: datetime
+    updated_at: datetime
+    intervention_id: int
+
     model_config = ConfigDict(from_attributes=True) 
