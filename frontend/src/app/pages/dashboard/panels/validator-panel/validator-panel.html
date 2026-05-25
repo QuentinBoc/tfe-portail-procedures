@@ -129,98 +129,110 @@
         <div class="flex flex-col">
             <div class="grid grid-cols-[minmax(325px,1fr)_full] gap-2">
                 @for (intervention of interventionsValidated; track intervention.id) {
-                <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
-                    ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-                    : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
-                    <div class="grid grid-cols-2 items-center justify-between gap-3 mb-3">
-                        <p class="text-[#3E5153] font-semibold text-center">{{ intervention.title }}</p>
-                        <h4 class="text-xs text-[#628276] text-center">{{ intervention.created_at | date:'dd/MM/yyyy' }}
-                        </h4>
-                    </div>
-                    <div class="grid transition-all duration-300"
-                        [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
-                        <div class="w-full overflow-hidden border border-[#9D9E81] rounded-lg shadow-sm">
-                            <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
-                                <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
-                            </div>
-                            <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
-                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                    <span
-                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
-                                    <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
-                                </div>
-                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                    <span
-                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
-                                    <span class="text-[#3E5153]">{{ intervention.location }}</span>
-                                </div>
-                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                    <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date
-                                        de
-                                        création</span>
-                                    <span class="font-mono text-[#3E5153]">{{ intervention.created_at |
-                                        date:"dd/MM/yyyy"
-                                        }}</span>
-                                </div>
-                                <div class="flex flex-col pb-3">
-                                    <span
-                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
-                                    <span [ngClass]="getStatusClass(intervention.status).cssClass"
-                                        class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                        {{ getStatusClass(intervention.status).label }}
-                                    </span>
-                                </div>
 
-                                <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
-                                    <span class="text-xs text-[#628276]">Progression</span>
-                                    <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
-                                        <div [class]="getProgressWidth(intervention.status)"
-                                            class="h-full rounded-full transition-all duration-500">
-                                        </div>
-                                    </div>
-                                </div>
-                                @if (reports[intervention.id]?.length){
-                                @for (report of reports[intervention.id]; track report.id){
-                                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                                    <span
-                                        class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Rapport
-                                        de cette intervention</span>
-                                    <span class="font-mono text-[#3E5153]">{{ report.description }}</span>
-                                </div>
-                                }
-                                }
-                            </div>
+                <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
+                ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153] rounded-b-none'
+                : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
+
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex flex-col items-start">
+                            <p class="text-[#3E5153] font-semibold text-base mb-0.5">{{ intervention.title }}</p>
+                            <h4 class="text-xs text-[#628276] font-mono">{{ intervention.created_at | date:'dd/MM/yyyy'
+                                }}</h4>
+                        </div>
+
+                        <div>
+                            <span [ngClass]="getStatusClass(intervention.status).cssClass"
+                                class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider !bg-transparent">
+                                {{ getStatusClass(intervention.status).label }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
+                <div class="grid transition-all duration-300"
+                    [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr] mb-4' : 'grid-rows-[0fr]'">
+                    <div
+                        class="w-full overflow-hidden border-x border-b border-[#416F6F] rounded-b-xl shadow-sm bg-white">
+                        <div class="bg-[#3E5153] px-4 py-3.5 flex items-center">
+                            <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
+                        </div>
+                        <div class="p-6 text-sm grid grid-cols-2 gap-4">
+                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                <span
+                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre</span>
+                                <span class="font-semibold text-[#3E5153]">{{ intervention.title }}</span>
+                            </div>
+                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                <span
+                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Lieu</span>
+                                <span class="text-[#3E5153]">{{ intervention.location }}</span>
+                            </div>
+                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Date de
+                                    création</span>
+                                <span class="font-mono text-[#3E5153]">{{ intervention.created_at | date:"dd/MM/yyyy"
+                                    }}</span>
+                            </div>
+                            <div class="flex flex-col pb-3">
+                                <span
+                                    class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Statut</span>
+                                <span [ngClass]="getStatusClass(intervention.status).cssClass"
+                                    class="inline-block w-fit px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    {{ getStatusClass(intervention.status).label }}
+                                </span>
+                            </div>
 
-                }
-                <div class="flex justify-center items-center gap-10 mt-8 mb-10">
-                    <button (click)="previousPage()" [disabled]="skip === 0"
-                        class="flex items-center gap-2 px-5 py-2 border border-[#9D9E81] text-[#3E5153] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#fdf8f2] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Précédent
-                    </button>
+                            <div class="col-span-2 pt-2 border-t border-[#9D9E81]/30">
+                                <span class="text-xs text-[#628276]">Progression</span>
+                                <div class="w-full h-1.5 bg-[#9D9E81]/30 rounded-full mt-1">
+                                    <div [class]="getProgressWidth(intervention.status)"
+                                        class="h-full rounded-full transition-all duration-500">
+                                    </div>
+                                </div>
+                            </div>
 
-                    <span class="text-[10px] font-bold text-[#628276] uppercase tracking-[0.2em]">
-                        Interventions de {{ skip + 1 }} à {{ skip + interventionsValidated.length }}
-                    </span>
-
-                    <button (click)="nextPage()" [disabled]="interventionsValidated.length < limit"
-                        class="flex items-center gap-2 px-5 py-2 bg-[#3E5153] text-[#FFD195] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#4a6163] transition-all shadow-md disabled:opacity-30 disabled:cursor-not-allowed">
-                        Suivant
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                            @if (reports[intervention.id]?.length){
+                            @for (report of reports[intervention.id]; track report.id){
+                            <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                                <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Rapport
+                                    de cette intervention</span>
+                                <span class="font-mono text-[#3E5153]">{{ report.description }}</span>
+                            </div>
+                            }
+                            }
+                        </div>
+                    </div>
                 </div>
+                }
             </div>
 
+
+
+            <div class="flex justify-center items-center gap-10 mt-8 mb-10">
+                <button (click)="previousPage()" [disabled]="skip === 0"
+                    class="flex items-center gap-2 px-5 py-2 border border-[#9D9E81] text-[#3E5153] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#fdf8f2] transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Précédent
+                </button>
+
+                <span class="text-[10px] font-bold text-[#628276] uppercase tracking-[0.2em]">
+                    Interventions de {{ skip + 1 }} à {{ skip + interventionsValidated.length }}
+                </span>
+
+                <button (click)="nextPage()" [disabled]="interventionsValidated.length < limit"
+                    class="flex items-center gap-2 px-5 py-2 bg-[#3E5153] text-[#FFD195] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#4a6163] transition-all shadow-md disabled:opacity-30 disabled:cursor-not-allowed">
+                    Suivant
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
         </div>
+
     </div>
 </div>

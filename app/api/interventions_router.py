@@ -110,7 +110,7 @@ def get_validated_interventions(
     """Récupère les interventions validées"""
     interventions = (
         db.query(Intervention)
-        .filter(Intervention.status == "VALIDATED")
+        .filter(Intervention.status.in_(["VALIDATED", "ASSIGNED", "PROCESSING", "CLOSED"]))
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
