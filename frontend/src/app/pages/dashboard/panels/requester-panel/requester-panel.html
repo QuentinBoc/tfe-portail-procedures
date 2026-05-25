@@ -154,6 +154,15 @@
                     {{ getStatusClass(intervention.status).label }}
                   </span>
                 </div>
+                @if (reports[intervention.id]?.length){
+                  @for (report of reports[intervention.id]; track report.id){
+                    <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                  <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Rapport de cette intervention</span>
+                  <span class="font-mono text-[#3E5153]">{{ report.description }}</span>
+                </div>
+                  }
+                }
+                
               </div>
             </div>
           </div>

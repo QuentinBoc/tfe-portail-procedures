@@ -2,8 +2,11 @@ import { Intervention } from './../../../interfaces/intervention.model';
 import { IStatusInfo } from './../../../interfaces/ilabel';
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ReportService } from './../../../../services/report.service';
+import { InterventionReport } from '../../../interfaces/report.model';
+
 
 @Component({
   selector: 'app-requester-panel',
@@ -19,10 +22,12 @@ export class RequesterPanel implements OnInit {
   showModal = false;
   selectedIntervention: Intervention | null = null;
   form;
+  reports: Record<number, InterventionReport[]> = {}
 
   constructor(
     private interventionService: InterventionService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private reportService: ReportService
   ) {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -93,7 +98,12 @@ export class RequesterPanel implements OnInit {
     if (this.expandedId === id) {
       this.expandedId = null
     } else {
-      this.expandedId = id
+      this.expandedId = id,
+        this.reportService.getReports(id).subscribe({
+          next: (data) => {
+            this.reports[id] = data
+          }
+        })
     }
   }
 

@@ -105,13 +105,52 @@
                             </span>
                         </div>
                         <div class="flex justify-center pt-2">
-                            <button class="btn-success"
-                                (click)="closeIntervention(intervention.id); $event.stopPropagation()">Clôturer</button>
+                            <div class="flex justify-center pt-2">
+                                <button class="btn-success"
+                                    (click)="onReportForm(intervention.id, 'closure'); $event.stopPropagation()">Clôturer</button>
+                            </div>
+                            <div class="flex justify-center pt-2">
+                                <button class="btn-alert"
+                                    (click)="onReportForm(intervention.id, 'problem'); $event.stopPropagation()">Signaler
+                                    un problème</button>
+                            </div>
+                            @if (reportFormId === intervention.id){
+                            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                (click)="$event.stopPropagation()">
+                                <div
+                                    class="bg-white w-full max-w-md p-6 rounded-xl border border-[#9D9E81] shadow-2xl transform transition-all">
+                                    <div class="border-b border-[#9D9E81]/30 pb-3 mb-4">
+                                        <h3 class="text-base font-semibold text-[#3E5153] uppercase tracking-wider">
+                                            {{ reportType === 'closure' ? 'Rapport de clôture' : 'Signalement de problème' }}</h3>
+                                    </div>
+
+                                    <div class="flex flex-col gap-2 mb-5">
+                                        <label for="reportDescription"
+                                            class="text-[#628276] text-xs font-medium uppercase tracking-wider">
+                                            Décrivez ce qui a été fait: </label>
+                                        <textarea id="reportDescription" [(ngModel)]="reportDescription" rows="4"
+                                            placeholder="Saisissez les détails de l'intervention..."
+                                            class="w-full p-3 border border-[#9D9E81]/60 rounded-lg text-sm text-[#3E5153] focus:outline-none focus:border-[#416F6F] focus:ring-1 focus:ring-[#416F6F] resize-none bg-[#fdf8f2]/30">
+            </textarea>
+                                    </div>
+
+                                    <div class="flex justify-end gap-3 border-t border-[#9D9E81]/30 pt-4">
+                                        <button type="button"
+                                            class="px-4 py-2 text-xs font-bold text-[#628276] uppercase tracking-wider hover:bg-gray-100 rounded-lg transition-colors"
+                                            (click)="reportFormId = null">
+                                            Annuler
+                                        </button>
+                                        <button type="button" (click)="submitReport()" [disabled]="!reportDescription"
+                                            class="btn-alert disabled:opacity-40 disabled:cursor-not-allowed">
+                                            {{ reportType === 'closure' ? 'Clôturer l&aposintervention' : 'Signaler le problème' }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            }
                         </div>
                         <div class="flex justify-center pt-2">
-                            <button class="btn-alert"
-                                (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un
-                                problème</button>
+
                         </div>
                     </div>
                 </div>

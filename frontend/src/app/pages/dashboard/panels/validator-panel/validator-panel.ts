@@ -4,11 +4,14 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Intervention } from '../../../interfaces/intervention.model';
 import { IStatusInfo } from '../../../interfaces/ilabel';
 import { NotificationService } from '../../../../services/notification.service';
+import { InterventionReport } from '../../../interfaces/report.model';
+import { ReportService } from '../../../../services/report.service';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-validator-panel',
-  imports: [DatePipe, NgClass],
+  imports: [DatePipe, NgClass, ReactiveFormsModule, FormsModule],
   templateUrl: './validator-panel.html',
   styleUrl: './validator-panel.css',
 
@@ -19,11 +22,16 @@ export class ValidatorPanel implements OnInit {
   interventionsValidated: Intervention[] = [];
   skip: number = 0;
   limit: number = 5;
-  
+  reportFormId: number | null = null;
+  reportDescription: string = '';
+  reportType: 'refusal' | null = null;
+  reports: Record<number, InterventionReport[]> = {}
+
 
   constructor(
     private interventionService: InterventionService,
     private notificationService: NotificationService,
+    private reportService: ReportService,
   ) { }
   /**Charge les interventions en attentes */
   loadPendingInterventions(): void {
@@ -83,7 +91,12 @@ export class ValidatorPanel implements OnInit {
     if (this.expandedId === id) {
       this.expandedId = null
     } else {
-      this.expandedId = id
+      this.expandedId = id,
+        this.reportService.getReports(id).subscribe({
+          next: (data) => {
+            this.reports[id] = data
+          }
+        })
     }
   }
   /**Charge les methodes au démarrage */
@@ -139,6 +152,36 @@ export class ValidatorPanel implements OnInit {
 
   }
 
+  onReportForm(id: number): void {
+    if (this.reportFormId === id) {
+      this.reportFormId = null
+      this.reportDescription = ''
+    } else {
+      this.reportFormId = id
+    }
+  }
+
+  submitReport() {
+    if (!this.reportFormId) return;
+
+    const submitReport = {
+      type: 'refusal' as const,
+      description: this.reportDescription,
+      intervention_id: this.reportFormId
+    }
+  
+
+    this.reportService.addReport(submitReport).subscribe({
+          next: (data: InterventionReport) => {
+            this.loadPendingInterventions();
+            this.getValidated();
+            this.reportFormId = null;
+            this.reportDescription = ''
+          },
+          error: (err) => {
+            console.error('Erreur', err)
+          }
+        })
+      }
 
 }
-

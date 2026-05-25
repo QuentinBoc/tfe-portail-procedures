@@ -156,6 +156,7 @@ def get_closed_interventions(
     return interventions
 
 
+
 @router.patch("/{id}/processing", response_model=InterventionOut,)
 def process_intervention(
     id: int,

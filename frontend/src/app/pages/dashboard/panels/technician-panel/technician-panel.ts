@@ -1,15 +1,18 @@
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ReportService } from './../../../../services/report.service';
 import { Component, OnInit } from '@angular/core';
 import { InterventionService } from '../../../../services/intervention.service';
 import { DatePipe, CommonModule } from '@angular/common';
 import { Intervention } from '../../../interfaces/intervention.model';
 import { IStatusInfo } from '../../../interfaces/ilabel';
 import { NotificationService } from '../../../../services/notification.service';
+import { InterventionReport } from '../../../interfaces/report.model';
 
 
 
 @Component({
   selector: 'app-technician-panel',
-  imports: [DatePipe, CommonModule],
+  imports: [DatePipe, CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './technician-panel.html',
   styleUrl: './technician-panel.css',
 })
@@ -20,10 +23,13 @@ export class TechnicianPanel implements OnInit {
   interventionsClosed: Intervention[] = [];
   skip: number = 0;
   limit: number = 5;
-
+  reportFormId: number | null = null;
+  reportDescription: string = '';
+  reportType: 'closure' | 'problem' | null = null
   constructor(
     private interventionService: InterventionService,
-    private notificationService: NotificationService,) { }
+    private notificationService: NotificationService,
+    private reportService: ReportService) { }
   /**Récupère les intervention assignées */
   getAssigned(): void {
     this.interventionService.getAssigned(this.skip, this.limit).subscribe({
@@ -129,4 +135,37 @@ export class TechnicianPanel implements OnInit {
     this.getClosed();
 
   }
+
+  onReportForm(id: number, type: 'closure' | 'problem'): void {
+    if (this.reportFormId === id) {
+      this.reportFormId = null
+      this.reportDescription = ''
+    } else {
+      this.reportFormId = id
+      this.reportType = type
+    }
+  }
+
+  submitReport() {
+    if (!this.reportFormId || !this.reportType) return;
+
+    const submitReport = {
+      type: this.reportType,
+      description: this.reportDescription,
+      intervention_id: this.reportFormId
+    }
+
+    this.reportService.addReport(submitReport).subscribe({
+      next: (data: InterventionReport) => {
+        this.getProcessing();
+        this.getClosed();
+        this.reportFormId = null;
+        this.reportDescription = ''
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+    })
+  }
+
 }
