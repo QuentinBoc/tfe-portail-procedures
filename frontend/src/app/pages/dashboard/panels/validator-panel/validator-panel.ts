@@ -169,19 +169,54 @@ export class ValidatorPanel implements OnInit {
       description: this.reportDescription,
       intervention_id: this.reportFormId
     }
-  
+
 
     this.reportService.addReport(submitReport).subscribe({
-          next: (data: InterventionReport) => {
-            this.loadPendingInterventions();
-            this.getValidated();
-            this.reportFormId = null;
-            this.reportDescription = ''
-          },
-          error: (err) => {
-            console.error('Erreur', err)
-          }
-        })
+      next: (data: InterventionReport) => {
+        this.loadPendingInterventions();
+        this.getValidated();
+        this.reportFormId = null;
+        this.reportDescription = ''
+      },
+      error: (err) => {
+        console.error('Erreur', err)
       }
+    })
+  }
+
+  hideIntervention(id: number): void {
+    this.interventionService.hideIntervention(id).subscribe({
+      next: () => {
+        this.loadPendingInterventions();
+        this.getValidated();
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+    })
+  }
+
+  confirmHide(id: number): void {
+    const hasConfirmed = window.confirm('Confirmez-vous la suppression de l\'affichage de cette intervention ?');
+    if (hasConfirmed) {
+      this.hideIntervention(id);
+    }
+  }
+
+  downloadPdf(id: number): void {
+    this.interventionService.exportPdf(id).subscribe({
+        next: (blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `intervention_${id}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+            console.error('Erreur export PDF', err)
+        }
+    })
+}
 
 }

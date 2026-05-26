@@ -35,7 +35,7 @@ export class SupervisorPanel implements OnInit {
   getValidated(): void {
     this.interventionService.getValidated(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
-       const oldLength = this.interventionsValidate.length
+        const oldLength = this.interventionsValidate.length
         this.interventionsValidate = data;
         const newLength = this.interventionsValidate.length
         if (oldLength !== newLength)
@@ -51,7 +51,7 @@ export class SupervisorPanel implements OnInit {
   getAssigned(): void {
     this.interventionService.getAssigned(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
-      const oldLength = this.interventionsAssigned.length
+        const oldLength = this.interventionsAssigned.length
         this.interventionsAssigned = data;
         const newLength = this.interventionsAssigned.length
         if (oldLength !== newLength)
@@ -76,10 +76,10 @@ export class SupervisorPanel implements OnInit {
   }
   /** Extention des cartes interventions en accordéon */
   expandedId: number | null = null
-  toggleDetails(id: number){
-    if (this.expandedId === id){
+  toggleDetails(id: number) {
+    if (this.expandedId === id) {
       this.expandedId = null
-    }else{
+    } else {
       this.expandedId = id
     }
   }
@@ -117,12 +117,12 @@ export class SupervisorPanel implements OnInit {
   /** Retourne le label français et la classe CSS selon le statut */
   getStatusClass(status: string): IStatusInfo {
     const classes: Record<string, IStatusInfo> = {
-      'PENDING':    { label: 'En attente',             cssClass: 'text-yellow-500 bg-yellow-100/60 dark:bg-gray-800' },
-      'VALIDATED':  { label: 'Validée par direction',  cssClass: 'text-blue-500 bg-blue-100/60 dark:bg-gray-800' },
-      'ASSIGNED':   { label: 'Assignée au technicien',  cssClass: 'text-indigo-500 bg-indigo-100/60 dark:bg-gray-800' },
-      'PROCESSING': { label: 'Intervention en cours',   cssClass: 'text-purple-500 bg-purple-100/60 dark:bg-gray-800' },
-      'CLOSED':     { label: 'Intervention clôturée',   cssClass: 'text-emerald-500 bg-emerald-100/60 dark:bg-gray-800' },
-      'REJECTED':   { label: 'Intervention rejetée',    cssClass: 'text-red-500 bg-red-100/60 dark:bg-gray-800' },
+      'PENDING': { label: 'En attente', cssClass: 'text-yellow-500 bg-yellow-100/60 dark:bg-gray-800' },
+      'VALIDATED': { label: 'Validée par direction', cssClass: 'text-blue-500 bg-blue-100/60 dark:bg-gray-800' },
+      'ASSIGNED': { label: 'Assignée au technicien', cssClass: 'text-indigo-500 bg-indigo-100/60 dark:bg-gray-800' },
+      'PROCESSING': { label: 'Intervention en cours', cssClass: 'text-purple-500 bg-purple-100/60 dark:bg-gray-800' },
+      'CLOSED': { label: 'Intervention clôturée', cssClass: 'text-emerald-500 bg-emerald-100/60 dark:bg-gray-800' },
+      'REJECTED': { label: 'Intervention rejetée', cssClass: 'text-red-500 bg-red-100/60 dark:bg-gray-800' },
     };
     return classes[status] ?? { label: 'Statut inconnu', cssClass: 'text-gray-500 bg-gray-100/60 dark:bg-gray-800' };
   }
@@ -130,12 +130,12 @@ export class SupervisorPanel implements OnInit {
   /** Retourne la classe CSS de la barre de progression selon le statut */
   getProgressWidth(status: string): string {
     const classes: Record<string, string> = {
-      'PENDING':    'bg-blue-500 w-1/5 h-1.5',
-      'VALIDATED':  'bg-blue-500 w-2/5 h-1.5',
-      'ASSIGNED':   'bg-blue-500 w-3/5 h-1.5',
+      'PENDING': 'bg-blue-500 w-1/5 h-1.5',
+      'VALIDATED': 'bg-blue-500 w-2/5 h-1.5',
+      'ASSIGNED': 'bg-blue-500 w-3/5 h-1.5',
       'PROCESSING': 'bg-blue-500 w-4/5 h-1.5',
-      'CLOSED':     'bg-emerald-500 w-full h-1.5',
-      'REJECTED':   'bg-red-500 w-full h-1.5',
+      'CLOSED': 'bg-emerald-500 w-full h-1.5',
+      'REJECTED': 'bg-red-500 w-full h-1.5',
     };
     return classes[status] ?? 'bg-yellow-500 w-full h-1.5';
   }
@@ -152,4 +152,39 @@ export class SupervisorPanel implements OnInit {
     this.getAssigned();
 
   }
+
+  hideIntervention(id: number): void {
+    this.interventionService.hideIntervention(id).subscribe({
+      next: () => {
+        this.getValidated();
+        this.getAssigned();
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+    })
+  }
+
+   confirmHide(id: number): void {
+    const hasConfirmed = window.confirm('Confirmez-vous la suppression de l\'affichage de cette intervention ?');
+    if (hasConfirmed) {
+      this.hideIntervention(id);
+    }
+  }
+  
+  downloadPdf(id: number): void {
+    this.interventionService.exportPdf(id).subscribe({
+        next: (blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `intervention_${id}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+            console.error('Erreur export PDF', err)
+        }
+    })
+}
 }

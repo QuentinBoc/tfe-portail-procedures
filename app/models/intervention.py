@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from app.core.db import Base
 
 
@@ -26,3 +26,4 @@ class Intervention(Base):
     closed_at = Column(DateTime, nullable=True)
     rejected_by = Column(Integer, ForeignKey("users.id", name="fk_interventions_rejected_by"), nullable=True)
     rejected_at = Column(DateTime, nullable=True)
+    is_hidden = Column(Boolean, nullable=False, default=False, server_default="0")

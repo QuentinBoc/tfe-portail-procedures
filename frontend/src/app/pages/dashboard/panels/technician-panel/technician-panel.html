@@ -121,7 +121,8 @@
                                     class="bg-white w-full max-w-md p-6 rounded-xl border border-[#9D9E81] shadow-2xl transform transition-all">
                                     <div class="border-b border-[#9D9E81]/30 pb-3 mb-4">
                                         <h3 class="text-base font-semibold text-[#3E5153] uppercase tracking-wider">
-                                            {{ reportType === 'closure' ? 'Rapport de clôture' : 'Signalement de problème' }}</h3>
+                                            {{ reportType === 'closure' ? 'Rapport de clôture' : 'Signalement de
+                                            problème' }}</h3>
                                     </div>
 
                                     <div class="flex flex-col gap-2 mb-5">
@@ -142,7 +143,8 @@
                                         </button>
                                         <button type="button" (click)="submitReport()" [disabled]="!reportDescription"
                                             class="btn-alert disabled:opacity-40 disabled:cursor-not-allowed">
-                                            {{ reportType === 'closure' ? 'Clôturer l&aposintervention' : 'Signaler le problème' }}
+                                            {{ reportType === 'closure' ? 'Clôturer l&aposintervention' : 'Signaler le
+                                            problème' }}
                                         </button>
                                     </div>
                                 </div>
@@ -208,6 +210,16 @@
                                 {{ getStatusClass(intervention.status).label }}
                             </span>
                         </div>
+                        <div class="col-span-2 flex justify-end mt-2">
+                            @if (intervention.status === 'CLOSED' || intervention.status === 'REJECTED') {
+                            <button type="button"
+                                class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium text-xs uppercase tracking-wider rounded shadow-sm transition-colors duration-200"
+                                (click)="$event.stopPropagation(); confirmHide(intervention.id)">
+                                Supprimer
+                            </button>
+                            }
+                        </div>
+                        
                     </div>
                 </div>
             </div>

@@ -106,7 +106,7 @@
           <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
             <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
           </div>
-          <div class="bg-white p-6 text-sm grid grid-cols-2 gap-4">
+          <div class="col-span-2 flex justify-end items-center gap-3 mt-2">
             <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
               <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description</span>
               <span class="font-semibold text-[#3E5153]">{{ intervention.description}}</span>
@@ -118,6 +118,18 @@
                 class="inline-block w-fit px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider">
                 {{ getStatusClass(intervention.status).label }}
               </span>
+            </div>
+            <div class="col-span-2 flex justify-end items-center gap-3 mt-2">
+              @if (intervention.status === 'CLOSED' || intervention.status === 'REJECTED') {
+              <button type="button"
+                class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium text-xs uppercase tracking-wider rounded shadow-sm transition-colors duration-200"
+                (click)="$event.stopPropagation(); confirmHide(intervention.id)">
+                Masquer
+              </button>
+              }
+              <button class="btn-primary" (click)="downloadPdf(intervention.id); $event.stopPropagation()">
+                Télécharger PDF
+              </button>
             </div>
           </div>
         </div>

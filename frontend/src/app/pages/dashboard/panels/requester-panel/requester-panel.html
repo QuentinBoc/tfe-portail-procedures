@@ -70,7 +70,7 @@
         </button>
         <button [disabled]="form.invalid" type="submit"
           class="flex-1 py-3 px-4 text-white font-semibold rounded-xl transition-colors duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          style="background:#3E5153" onmouseover ="this.style.background='#416F6F'"
+          style="background:#3E5153" onmouseover="this.style.background='#416F6F'"
           onmouseout="this.style.background='#3E5153'">
           Envoyer
         </button>
@@ -155,14 +155,24 @@
                   </span>
                 </div>
                 @if (reports[intervention.id]?.length){
-                  @for (report of reports[intervention.id]; track report.id){
-                    <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
-                  <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Rapport de cette intervention</span>
+                @for (report of reports[intervention.id]; track report.id){
+                <div class="flex flex-col border-b border-[#9D9E81]/30 pb-3">
+                  <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Rapport de cette
+                    intervention</span>
                   <span class="font-mono text-[#3E5153]">{{ report.description }}</span>
                 </div>
-                  }
                 }
-                
+                }
+                <div class="col-span-2 flex justify-end mt-2">
+                  @if (intervention.status === 'CLOSED' || intervention.status === 'REJECTED') {
+                  <button type="button"
+                    class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium text-xs uppercase tracking-wider rounded shadow-sm transition-colors duration-200"
+                    (click)="$event.stopPropagation(); confirmHide(intervention.id)">
+                    Supprimer
+                  </button>
+                  }
+                </div>
+
               </div>
             </div>
           </div>

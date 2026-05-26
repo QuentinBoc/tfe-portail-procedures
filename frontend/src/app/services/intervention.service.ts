@@ -8,7 +8,7 @@ import { Observable } from "rxjs";
 })
 export class InterventionService {
   private apiURL = 'http://127.0.0.1:8000/api/v1/interventions';
-  
+
 
   constructor(private http: HttpClient) { }
 
@@ -33,7 +33,7 @@ export class InterventionService {
   }
 
   assign(id: number, assigneeId: number) {
-    return this.http.patch(`${this.apiURL}/${id}/assign`, {assignee_id : assigneeId});
+    return this.http.patch(`${this.apiURL}/${id}/assign`, { assignee_id: assigneeId });
   }
 
   closedIntervention(id: number) {
@@ -63,5 +63,15 @@ export class InterventionService {
   getClosed(skip: number, limit: number): Observable<Intervention[]> {
     return this.http.get<Intervention[]>(`${this.apiURL}/closed?skip=${skip}&limit=${limit}`);
   }
-  
+
+  hideIntervention(id: number) {
+    return this.http.patch<Intervention>(`${this.apiURL}/${id}/hidden`, {});
+  }
+
+  exportPdf(id: number) {
+    return this.http.get(`${this.apiURL}/${id}/pdf`, {
+      responseType: 'blob'
+    });
+  }
+
 }

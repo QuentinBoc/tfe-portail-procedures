@@ -132,4 +132,22 @@ export class RequesterPanel implements OnInit {
     };
     return classes[status] ?? 'bg-yellow-500 w-full h-1.5';
   }
+
+  hideIntervention(id: number): void {
+    this.interventionService.hideIntervention(id).subscribe({
+      next: () => {
+        this.loadInterventions();
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+    })
+  }
+
+  confirmHide(id: number): void {
+    const hasConfirmed = window.confirm('Confirmez-vous la suppression de l\'affichage de cette intervention ?');
+    if (hasConfirmed) {
+      this.hideIntervention(id);
+    }
+  }
 }

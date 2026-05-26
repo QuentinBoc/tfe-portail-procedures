@@ -56,8 +56,6 @@ def get_report(
     if current_user.role_id == 1:
         query = query.filter(Report.type.in_([ReportType.CLOSURE, ReportType.REFUSAL]))
     reports = query.all()
-    if not reports:
-            raise HTTPException(status_code=404, detail="Rapport introuvable")
     
     return reports
     

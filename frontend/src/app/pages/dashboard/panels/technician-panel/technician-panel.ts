@@ -168,4 +168,24 @@ export class TechnicianPanel implements OnInit {
     })
   }
 
+  hideIntervention(id: number): void {
+    this.interventionService.hideIntervention(id).subscribe({
+      next: () => {
+        this.getProcessing();
+        this.getClosed();
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
+    })
+  }
+
+  confirmHide(id: number): void {
+    const hasConfirmed = window.confirm('Confirmez-vous la suppression de l\'affichage de cette intervention ?');
+    if (hasConfirmed) {
+      this.hideIntervention(id);
+    }
+  }
+
+  
 }

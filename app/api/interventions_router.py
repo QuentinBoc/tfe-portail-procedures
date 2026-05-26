@@ -42,6 +42,7 @@ def get_my_interventions(
     interventions = (
         db.query(Intervention)
         .filter(Intervention.created_by == current_user.id)
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -58,6 +59,7 @@ def get_all_interventions(
     """Récupère toutes les interventions selon le role de l'utilisateur"""
     interventions = (
         db.query(Intervention)
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -75,6 +77,7 @@ def get_pending_interventions(
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "PENDING")
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -93,6 +96,7 @@ def get_assigned_interventions(
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "ASSIGNED")
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -111,6 +115,7 @@ def get_validated_interventions(
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status.in_(["VALIDATED", "ASSIGNED", "PROCESSING", "CLOSED"]))
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -128,6 +133,7 @@ def get_processing_interventions(
     interventions = (
         db.query(Intervention)
         .filter(Intervention.status == "PROCESSING")
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -148,6 +154,7 @@ def get_closed_interventions(
             Intervention.status == "CLOSED",
             Intervention.assigned_to == _current_user.id
         )
+        .filter(Intervention.is_hidden == False)
         .order_by(Intervention.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -273,3 +280,19 @@ def close_intervention(
     
     return intervention
 
+@router.patch("/{id}/hidden", response_model=InterventionOut)
+def hidden_intervention(
+    id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Masquer une intervention clôturée ou rejetée"""
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
+    if intervention is None:
+        raise HTTPException(status_code=404, detail="Intervention introuvable")
+    if intervention.status not in ["CLOSED", "REJECTED"]:
+        raise HTTPException(status_code=400, detail="Seules les interventions clôturées ou rejetées peuvent être masquées")
+    intervention.is_hidden = True
+    db.commit()
+    db.refresh(intervention)
+    return intervention
