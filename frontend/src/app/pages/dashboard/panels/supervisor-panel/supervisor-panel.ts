@@ -75,12 +75,13 @@ export class SupervisorPanel implements OnInit {
     });
   }
   /** Extention des cartes interventions en accordéon */
-  expandedId: number | null = null
-  toggleDetails(id: number) {
-    if (this.expandedId === id) {
-      this.expandedId = null
+  expandedId: { id: number | null, section: 'validate' | 'assigned' | null } = { id: null, section: null };
+
+  toggleDetails(id: number, section: 'validate' | 'assigned') {
+    if (this.expandedId.id === id && this.expandedId.section === section) {
+      this.expandedId = { id: null, section: null };
     } else {
-      this.expandedId = id
+      this.expandedId = { id, section };
     }
   }
 
