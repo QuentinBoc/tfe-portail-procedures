@@ -6,6 +6,8 @@ from app.api.schemas import InterventionCreate, InterventionOut, AssignRequest
 from app.core.permissions import require_min_level
 from app.core.security import get_current_user
 from app.core.db import get_db
+from app.models.enums import ReportType
+from app.models.reports import Report
 from app.models.user import User
 from app.models.intervention import Intervention
 from app.services.notification_service import check_notification, notification_all_users
@@ -293,6 +295,34 @@ def hidden_intervention(
     if intervention.status not in ["CLOSED", "REJECTED"]:
         raise HTTPException(status_code=400, detail="Seules les interventions clôturées ou rejetées peuvent être masquées")
     intervention.is_hidden = True
+    db.commit()
+    db.refresh(intervention)
+    return intervention
+
+@router.patch("/{id}/reactivate", response_model=InterventionOut)
+def reactivate_intervention(
+    id: int,
+    current_user: User = Depends(require_min_level(3)),
+    db: Session = Depends(get_db)
+):
+    """Réactive une intervention signalée en problème — remet en VALIDATED pour réassignation"""
+    intervention = db.query(Intervention).filter(Intervention.id == id).first()
+    if intervention is None:
+        raise HTTPException(status_code=404, detail="Intervention introuvable")
+    if intervention.status != "PROCESSING":
+        raise HTTPException(status_code=400, detail="Seules les interventions en cours peuvent être réactivées")
+    intervention.status = "VALIDATED"
+    intervention.assigned_to = None
+    intervention.assigned_at = None
+    intervention.processing_by = None
+    intervention.processing_at = None
+    
+    # Supprimer les rapports de problème liés
+    db.query(Report).filter(
+        Report.intervention_id == id,
+        Report.type == ReportType.PROBLEM
+    ).delete()
+    
     db.commit()
     db.refresh(intervention)
     return intervention

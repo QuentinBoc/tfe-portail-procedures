@@ -25,7 +25,12 @@ export class TechnicianPanel implements OnInit {
   limit: number = 5;
   reportFormId: number | null = null;
   reportDescription: string = '';
-  reportType: 'closure' | 'problem' | null = null
+  reportType: 'closure' | 'problem' | null = null;
+  problemIds: Set<number> = new Set();
+  reports: Record<number, InterventionReport[]> = {};
+
+  
+
   constructor(
     private interventionService: InterventionService,
     private notificationService: NotificationService,
@@ -57,7 +62,7 @@ export class TechnicianPanel implements OnInit {
       }
     })
   }
-  /**Récupère une intervention en cours de traitement */
+  /**Récupère une intervention en cours de traitement + celles avec signalement*/
   getProcessing(): void {
     this.interventionService.getProcessing().subscribe({
       next: (data: Intervention[]) => {
@@ -66,12 +71,25 @@ export class TechnicianPanel implements OnInit {
         const newLength = this.interventionsProcessing.length
         if (oldLength !== newLength)
           this.notificationService.refresh()
+        
+        this.problemIds.clear();
+        data.forEach(intervention => {
+          this.reportService.getReports(intervention.id).subscribe({
+            next: (reports) => {
+              this.reports[intervention.id] = reports;
+              if (reports.some(r => r.type === 'problem')) {
+                this.problemIds.add(intervention.id);
+              }
+            }
+          });
+        });
       },
       error: (err) => {
         console.error('Erreur', err)
       }
     })
-  }
+}
+
   /**Ferme une intervention*/
   closeIntervention(id: number): void {
     this.interventionService.closedIntervention(id).subscribe({
@@ -98,12 +116,13 @@ export class TechnicianPanel implements OnInit {
   /** Extention des cartes interventions en accordéon */
   expandedId: number | null = null
   toggleDetails(id: number) {
+    console.log('toggle', id, 'current:', this.expandedId);
     if (this.expandedId === id) {
       this.expandedId = null
     } else {
       this.expandedId = id
     }
-  }
+}
 
   /**Charge les methodes au demarrage du composant */
   ngOnInit(): void {
@@ -187,5 +206,18 @@ export class TechnicianPanel implements OnInit {
     }
   }
 
+  getCardClass(id: number): string {
+    return this.expandedId === id
+      ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
+      : this.problemIds.has(id)
+        ? 'bg-red-50 border-red-400 border-l-4 border-l-red-500'
+        : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]';
+  }
+
+  getExpandClass(id: number): string {
+    return this.expandedId === id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]';
+  }
+
   
+
 }

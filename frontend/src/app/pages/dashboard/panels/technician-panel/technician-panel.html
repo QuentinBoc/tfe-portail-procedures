@@ -5,16 +5,14 @@
 
     <div class="grid grid-cols-1 gap-2">
         @for (intervention of interventionsAssigned; track intervention.id) {
-        <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
-                ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-                : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
+        <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+            [ngClass]="getCardClass(intervention.id)" (click)="toggleDetails(intervention.id)">
             <div class="grid grid-cols-2 items-center text-center">
                 <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
                 <span class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
             </div>
         </div>
-        <div class="grid transition-all duration-300"
-            [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+        <div class="grid transition-all duration-300" [ngClass]="getExpandClass(intervention.id)">
             <div class="w-full overflow-hidden  rounded-lg shadow-sm">
                 <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
                     <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
@@ -40,18 +38,18 @@
                             {{ getStatusClass(intervention.status).label }}
                         </span>
 
-                        <div class="col-span-2 flex gap-3 mt-1.5 justify-center">
-                            <button
-                                class="px-3 py-1.5 bg-[#e6f4ea] text-[#1e7e34] rounded-md text-[11px] font-semibold uppercase tracking-wider hover:bg-[#d4ebd9] transition shadow-sm border border-[#c3e6cb]"
-                                (click)="processingIntervention(intervention.id)">Prendre en
-                                charge</button>
+                    </div>
+                    <div class="col-span-2 flex gap-3 mt-1.5 justify-center">
+                        <button
+                            class="px-3 py-1.5 bg-[#e6f4ea] text-[#1e7e34] rounded-md text-[11px] font-semibold uppercase tracking-wider hover:bg-[#d4ebd9] transition shadow-sm border border-[#c3e6cb]"
+                            (click)="processingIntervention(intervention.id)">Prendre en
+                            charge</button>
 
 
-                            <button
-                                class="px-3 py-1.5 bg-[#fce8e6] text-[#b21f2d] rounded-md text-[11px] font-semibold uppercase tracking-wider hover:bg-[#fadbd8] transition shadow-sm border border-[#f5c6cb]"
-                                (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un
-                                problème</button>
-                        </div>
+                        <button
+                            class="px-3 py-1.5 bg-[#fce8e6] text-[#b21f2d] rounded-md text-[11px] font-semibold uppercase tracking-wider hover:bg-[#fadbd8] transition shadow-sm border border-[#f5c6cb]"
+                            (click)="closeIntervention(intervention.id); $event.stopPropagation()">Signaler un
+                            problème</button>
                     </div>
                 </div>
             </div>
@@ -72,16 +70,17 @@
         </div>
         <div class="grid grid-cols-1 gap-2">
             @for (intervention of interventionsProcessing; track intervention.id) {
-            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
-                    ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-                    : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
+            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+                [ngClass]="getCardClass(intervention.id)" (click)="toggleDetails(intervention.id)">
                 <div class="grid grid-cols-2 items-center text-center">
                     <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
                     <p class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
                 </div>
+                @if (problemIds.has(intervention.id)) {
+                <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">⚠ Problème signalé</span>
+                }
             </div>
-            <div class="grid transition-all duration-300"
-                [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+            <div class="grid transition-all duration-300" [ngClass]="getExpandClass(intervention.id)">
                 <div class="w-full overflow-hidden  rounded-lg shadow-sm">
                     <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
                         <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
@@ -124,23 +123,24 @@
 
                             @if (reportFormId === intervention.id){
                             <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                                (click)="$event.stopPropagation()">
-                                <div
-                                    class="bg-white w-full max-w-md p-6 rounded-xl border border-[#9D9E81] shadow-2xl transform transition-all">
+                                (click)="reportFormId = null">
+                                <div class="bg-white w-full max-w-md p-6 rounded-xl border border-[#9D9E81] shadow-2xl transform transition-all"
+                                    (click)="$event.stopPropagation()">
                                     <div class="border-b border-[#9D9E81]/30 pb-3 mb-4">
                                         <h3 class="text-base font-semibold text-[#3E5153] uppercase tracking-wider">
                                             {{ reportType === 'closure' ? 'Rapport de clôture' : 'Signalement de
-                                            problème' }}</h3>
+                                            problème' }}
+                                        </h3>
                                     </div>
 
                                     <div class="flex flex-col gap-2 mb-5">
                                         <label for="reportDescription"
                                             class="text-[#628276] text-xs font-medium uppercase tracking-wider">
-                                            Décrivez ce qui a été fait: </label>
+                                            Décrivez ce qui a été fait:
+                                        </label>
                                         <textarea id="reportDescription" [(ngModel)]="reportDescription" rows="4"
                                             placeholder="Saisissez les détails de l'intervention..."
-                                            class="w-full p-3 border border-[#9D9E81]/60 rounded-lg text-sm text-[#3E5153] focus:outline-none focus:border-[#416F6F] focus:ring-1 focus:ring-[#416F6F] resize-none bg-[#fdf8f2]/30">
-            </textarea>
+                                            class="w-full p-3 border border-[#9D9E81]/60 rounded-lg text-sm text-[#3E5153] focus:outline-none focus:border-[#416F6F] focus:ring-1 focus:ring-[#416F6F] resize-none bg-[#fdf8f2]/30"></textarea>
                                     </div>
 
                                     <div class="flex justify-end gap-3 border-t border-[#9D9E81]/30 pt-4">
@@ -158,9 +158,6 @@
                                 </div>
                             </div>
                             }
-                        </div>
-                        <div class="flex justify-center pt-2">
-
                         </div>
                     </div>
                 </div>
@@ -182,16 +179,14 @@
         </div>
         <div class="grid grid-cols-1 gap-2">
             @for (intervention of interventionsClosed; track intervention.id) {
-            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId === intervention.id
-                    ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-                    : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id)">
+            <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
+                [ngClass]="getCardClass(intervention.id)" (click)="toggleDetails(intervention.id)">
                 <div class="grid grid-cols-2 items-center text-center">
                     <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
                     <p class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
                 </div>
             </div>
-            <div class="grid transition-all duration-300"
-                [ngClass]="expandedId === intervention.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+            <div class="grid transition-all duration-300" [ngClass]="getExpandClass(intervention.id)">
                 <div class="w-full overflow-hidden  rounded-lg shadow-sm">
                     <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
                         <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>

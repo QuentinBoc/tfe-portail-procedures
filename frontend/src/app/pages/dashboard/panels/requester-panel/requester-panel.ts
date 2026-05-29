@@ -150,4 +150,6 @@ export class RequesterPanel implements OnInit {
       this.hideIntervention(id);
     }
   }
+
+  
 }

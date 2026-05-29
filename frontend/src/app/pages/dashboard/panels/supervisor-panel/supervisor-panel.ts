@@ -7,6 +7,8 @@ import { Intervention } from '../../../interfaces/intervention.model';
 import { User } from '../../../interfaces/users.model';
 import { IStatusInfo } from '../../../interfaces/ilabel';
 import { NotificationService } from '../../../../services/notification.service';
+import { ReportService } from '../../../../services/report.service';
+import { InterventionReport } from '../../../interfaces/report.model';
 
 
 @Component({
@@ -24,28 +26,43 @@ export class SupervisorPanel implements OnInit {
   selectedIntervention: Intervention | null = null;
   skip: number = 0;
   limit: number = 5;
+  interventionsToAssign: Intervention[] = [];
+  interventionsTracking: Intervention[] = [];
+  problemIds: Set<number> = new Set();
+  reports: Record<number, InterventionReport[]> = {};
 
   constructor(
     private interventionService: InterventionService,
     private userService: UserService,
     private notificationService: NotificationService,
+    private reportService: ReportService,
   ) { }
 
   /** Récupère les interventions validées */
   getValidated(): void {
     this.interventionService.getValidated(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
-        const oldLength = this.interventionsValidate.length
-        this.interventionsValidate = data;
-        const newLength = this.interventionsValidate.length
-        if (oldLength !== newLength)
-          this.notificationService.refresh()
+        this.interventionsToAssign = data.filter(i => i.status === 'VALIDATED');
+        this.interventionsTracking = data.filter(i => i.status !== 'VALIDATED');
+        this.notificationService.refresh();
+        
+        this.problemIds = new Set();
+        this.interventionsTracking.forEach(intervention => {
+            this.reportService.getReports(intervention.id).subscribe({
+                next: (reports) => {
+                    this.reports[intervention.id] = reports;
+                    if (reports.some(r => r.type === 'problem')) {
+                        this.problemIds = new Set([...this.problemIds, intervention.id]);
+                    }
+                }
+            });
+        });
       },
       error: (err) => {
         console.error('Erreur', err);
       }
     });
-  }
+}
 
   /** Récupère les interventions assignées */
   getAssigned(): void {
@@ -188,4 +205,20 @@ export class SupervisorPanel implements OnInit {
         }
     })
 }
+
+
+
+reactivateIntervention(id: number): void {
+    this.interventionService.reactivateIntervention(id).subscribe({
+        next: () => {
+            this.getValidated();
+            this.getAssigned();
+        },
+        error: (err) => {
+            console.error('Erreur', err)
+        }
+    })
+}
+
+  
 }

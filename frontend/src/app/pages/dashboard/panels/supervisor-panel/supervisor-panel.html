@@ -10,12 +10,10 @@
       <h3 class="text-sm font-semibold text-center text-[#FFD195] uppercase tracking-wider">À assigner</h3>
     </div>
     <div class="grid grid-cols-1 gap-2">
-      @for (intervention of interventionsValidate; track intervention.id) {
-      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" 
-        [ngClass]="expandedId.id === intervention.id && expandedId.section === 'validate'
+      @for (intervention of interventionsToAssign; track intervention.id) {
+      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId.id === intervention.id && expandedId.section === 'validate'
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" 
-        (click)="toggleDetails(intervention.id, 'validate')">
+          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id, 'validate')">
         <div class="flex items-center justify-between mb-3">
           <div class="inline-block px-3 py-1 text-xs font-semibold rounded-full"
             [ngClass]="getStatusClass(intervention.status).cssClass">
@@ -42,7 +40,7 @@
           </button>
         </div>
       </div>
-      
+
       <div class="grid transition-all duration-300"
         [ngClass]="expandedId.id === intervention.id && expandedId.section === 'validate' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
         <div class="w-full overflow-hidden rounded-lg shadow-sm">
@@ -81,17 +79,20 @@
       <h3 class="text-sm text-center font-semibold text-[#FFD195] uppercase tracking-wider">En cours...</h3>
     </div>
     <div class="grid grid-cols-1 gap-2">
-      @for (intervention of interventionsAssigned; track intervention.id) {
-      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" 
-        [ngClass]="expandedId.id === intervention.id && expandedId.section === 'assigned'
+      @for (intervention of interventionsTracking; track intervention.id) {
+      <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm" [ngClass]="expandedId.id === intervention.id && expandedId.section === 'assigned'
           ? 'bg-[#e8f0ef] border-[#416F6F] border-l-4 border-l-[#3E5153]'
-          : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" 
-        (click)="toggleDetails(intervention.id, 'assigned')">
+          : problemIds.has(intervention.id)
+        ? 'bg-red-50 border-red-400 border-l-4 border-l-red-500'
+        : 'bg-white border-[#9D9E81]/40 hover:bg-[#fdf8f2]'" (click)="toggleDetails(intervention.id, 'assigned')">
         <div class="flex justify-between items-start  pb-3 mb-3">
           <div class="flex flex-col">
             <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Titre:</span>
             <span class="text-[#3E5153] font-semibold">{{ intervention.title }}</span>
           </div>
+          @if (problemIds.has(intervention.id)) {
+          <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">⚠ Problème signalé</span>
+          }
           <div class="flex items-center justify-between mb-3">
             <span class="text-xs text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</span>
           </div>
@@ -171,7 +172,7 @@
                 {{ getStatusClass(intervention.status).label }}
               </span>
             </div>
-            
+
             <div class="col-span-2 flex justify-end items-center gap-3 mt-2">
               @if (intervention.status === 'CLOSED' || intervention.status === 'REJECTED') {
               <button type="button"
@@ -183,6 +184,11 @@
               <button class="btn-primary" (click)="downloadPdf(intervention.id); $event.stopPropagation()">
                 Télécharger PDF
               </button>
+              @if (problemIds.has(intervention.id)) {
+              <button class="btn-primary" (click)="reactivateIntervention(intervention.id); $event.stopPropagation()">
+                Réassigner
+              </button>
+              }
             </div>
           </div>
         </div>
@@ -211,7 +217,7 @@
           </svg>
         </button>
       </div>
-      
+
       @if (interventionsAssigned.length === 0) {
       <div class="text-center py-8 text-[#628276]">
         <p>Aucune intervention assignée.</p>

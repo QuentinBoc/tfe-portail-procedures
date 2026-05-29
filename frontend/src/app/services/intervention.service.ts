@@ -74,4 +74,8 @@ export class InterventionService {
     });
   }
 
+  reactivateIntervention(id: number) {
+    return this.http.patch<Intervention>(`${this.apiURL}/${id}/reactivate`, {});
+}
+
 }
