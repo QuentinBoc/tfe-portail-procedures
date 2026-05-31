@@ -1,49 +1,95 @@
 import { Component, OnInit } from '@angular/core';
-import { InterventionService } from '../../../../services/intervention.service';
-import { DatePipe } from '@angular/common';
-import { Intervention } from '../../../interfaces/intervention.model';
+import { UserService } from '../../../../services/user.service';
+import { CommonModule, DatePipe } from '@angular/common';
+import { User, UserCreateAdmin } from '../../../interfaces/users.model';
+import { FormsModule } from '@angular/forms';
 
 
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [DatePipe],
+  imports: [DatePipe, FormsModule, CommonModule],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.css',
 })
 
-export class AdminPanel implements OnInit{
+export class AdminPanel implements OnInit {
 
-  interventions: Intervention[] = [];
+  users: User[] = [];
+  showCreateForm: boolean = false;
+  newUser: UserCreateAdmin = { email: '', full_name: '', password: '', role_id: 1 };
+  selectedRoleId: Record<number, number> = {};
+  errorMessage: string = '';
 
   constructor(
-    private interventionService: InterventionService,
-  ) {}
+    private userService: UserService,
+  ) { }
   /**Charge les methodes au demarrage du composant */
   ngOnInit(): void {
-    this.allInterventions()
+    this.allUsers()
   }
-  /**Récupère toutes les interventions */
-  allInterventions(): void {
-    this.interventionService.getAll().subscribe({
-      next: (data: Intervention[]) => {
-        this.interventions = data;
+  /**Récupère toutes les utilisateurs */
+  allUsers(): void {
+    this.userService.getAllUsers().subscribe({
+      next: (data: User[]) => {
+        this.users = data;
       },
       error: (err) => {
         console.error('Erreur', err)
       }
     })
   }
-  /**Applique un style selon statut */
-  getStatusClass(status: string): string {
-  const classes: Record<string, string> = {
-    'PENDING':    'bg-yellow-100 text-yellow-800',
-    'VALIDATED':  'bg-blue-100 text-blue-800',
-    'ASSIGNED':   'bg-indigo-100 text-indigo-800',
-    'PROCESSING': 'bg-purple-100 text-purple-800',
-    'CLOSED':     'bg-green-100 text-green-800',
-    'REJECTED':   'bg-red-100 text-red-800',
-  };
-  return classes[status] ?? 'bg-gray-100 text-gray-800';
+
+  /** Création d'un utilisateur par Admin */
+  createUser(): void {
+    this.userService.createUser(this.newUser).subscribe({
+      next: (data: User) => {
+        this.allUsers()
+      }, error: (err) => {
+        const detail = err.error.detail;
+        if (Array.isArray(detail)) {
+          this.errorMessage = detail.map((e: any) => e.msg.replace('Value error, ', '')).join(', ');
+        } else {
+          this.errorMessage = detail;
+        }
+      }
+  })
+}
+
+  /** Mise à jour du rôle d'un utilisateur */
+  updateRole(id: number): void {
+    this.userService.updateRole(id, this.selectedRoleId[id]).subscribe({
+      next: (data: User) => {
+        this.allUsers()
+      }
+    })
   }
+
+  /** Désactivation d'un utilisateur */
+  deactivateUser(id: number): void {
+    this.userService.deactivateUser(id).subscribe({
+      next: (data: User) => {
+        this.allUsers()
+      }
+    })
+  }
+
+  confirmHide(id: number): void {
+    const hasConfirmed = window.confirm('Confirmez-vous la désactivation de l\'utilisateur ?');
+    if (hasConfirmed) {
+      this.deactivateUser(id);
+    }
+  }
+
+  getRoleLabel(roleId: number): string {
+    const roles: Record<number, string> = {
+      1: 'Utilisateur',
+      2: 'Technicien',
+      3: 'Chef',
+      4: 'Direction',
+      5: 'Admin'
+    };
+    return roles[roleId] ?? 'Inconnu';
+  }
+
 }

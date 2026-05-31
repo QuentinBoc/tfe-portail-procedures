@@ -42,27 +42,32 @@ export class SupervisorPanel implements OnInit {
   getValidated(): void {
     this.interventionService.getValidated(this.skip, this.limit).subscribe({
       next: (data: Intervention[]) => {
+        const oldLength = this.interventionsValidate.length
+        this.interventionsValidate = data;
+        const newLength = this.interventionsValidate.length
+        if (oldLength !== newLength)
+          this.notificationService.refresh()
         this.interventionsToAssign = data.filter(i => i.status === 'VALIDATED');
         this.interventionsTracking = data.filter(i => i.status !== 'VALIDATED');
         this.notificationService.refresh();
-        
+
         this.problemIds = new Set();
         this.interventionsTracking.forEach(intervention => {
-            this.reportService.getReports(intervention.id).subscribe({
-                next: (reports) => {
-                    this.reports[intervention.id] = reports;
-                    if (reports.some(r => r.type === 'problem')) {
-                        this.problemIds = new Set([...this.problemIds, intervention.id]);
-                    }
-                }
-            });
+          this.reportService.getReports(intervention.id).subscribe({
+            next: (reports) => {
+              this.reports[intervention.id] = reports;
+              if (reports.some(r => r.type === 'problem')) {
+                this.problemIds = new Set([...this.problemIds, intervention.id]);
+              }
+            }
+          });
         });
       },
       error: (err) => {
         console.error('Erreur', err);
       }
     });
-}
+  }
 
   /** Récupère les interventions assignées */
   getAssigned(): void {
@@ -183,42 +188,42 @@ export class SupervisorPanel implements OnInit {
     })
   }
 
-   confirmHide(id: number): void {
+  confirmHide(id: number): void {
     const hasConfirmed = window.confirm('Confirmez-vous la suppression de l\'affichage de cette intervention ?');
     if (hasConfirmed) {
       this.hideIntervention(id);
     }
   }
-  
+
   downloadPdf(id: number): void {
     this.interventionService.exportPdf(id).subscribe({
-        next: (blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `intervention_${id}.pdf`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        },
-        error: (err) => {
-            console.error('Erreur export PDF', err)
-        }
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `intervention_${id}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Erreur export PDF', err)
+      }
     })
-}
+  }
 
 
 
-reactivateIntervention(id: number): void {
+  reactivateIntervention(id: number): void {
     this.interventionService.reactivateIntervention(id).subscribe({
-        next: () => {
-            this.getValidated();
-            this.getAssigned();
-        },
-        error: (err) => {
-            console.error('Erreur', err)
-        }
+      next: () => {
+        this.getValidated();
+        this.getAssigned();
+      },
+      error: (err) => {
+        console.error('Erreur', err)
+      }
     })
-}
+  }
 
-  
+
 }
