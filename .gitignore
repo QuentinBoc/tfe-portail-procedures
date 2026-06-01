@@ -24,3 +24,9 @@ Thumbs.db
 # db
 *.db
 .claude/
+
+# Tailwind generated
+*.css.map
+laughing-vaughan-*
+
+**/.claude/
