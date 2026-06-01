@@ -37,6 +37,9 @@ async def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not is_valid:
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
     
+    if user.is_active == False:
+        raise HTTPException(status_code=403, detail="Votre compte est désactivé")
+    
     token = create_token(user.id)
 
     return {

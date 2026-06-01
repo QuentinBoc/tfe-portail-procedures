@@ -15,16 +15,16 @@ import { Router, RouterLink } from '@angular/router';
 
 export class Login {
 
-loading = false;
-errorMessage = '';
+  loading = false;
+  errorMessage = '';
 
   form;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-   ) {
+  ) {
     this.form = this.fb.group({
       email: ['', Validators.required],
       password: ['', Validators.required],
@@ -35,15 +35,15 @@ errorMessage = '';
     const { email, password } = this.form.value;
     const normalizedEmail = email?.trim().toLowerCase();
     if (!normalizedEmail || !password) return;
-    
+
     this.loading = true;
 
     this.auth.login(normalizedEmail, password!).subscribe({
       next: () => {
         this.auth.me().subscribe({
           next: (me: any) => {
-          this.loading = false;
-          this.router.navigate(['dashboard']);
+            this.loading = false;
+            this.router.navigate(['dashboard']);
           },
           error: (err) => {
             this.loading = false;
@@ -52,9 +52,12 @@ errorMessage = '';
         });
       },
       error: (err) => {
-            this.loading = false;
-            this.errorMessage = 'Email ou mot de passe incorrect.';
-            console.log('Erreur loggin', err?.error ?? err);
+        this.loading = false;
+        if (err.status === 403) {
+          this.errorMessage = err.error.detail;
+        } else {
+          this.errorMessage = 'Email ou mot de passe incorrect.';
+        }
       },
     });
   }

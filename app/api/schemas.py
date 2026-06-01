@@ -70,8 +70,13 @@ class UserOut(BaseModel):
     full_name: str
     id: int
     email: str
+    role_id: int
+    is_active: bool
     
     model_config = ConfigDict(from_attributes=True)
+
+class UserCreateAdmin(UserCreate):
+    role_id: int
 
 class NotificationOut(BaseModel):
     id: int
@@ -99,3 +104,6 @@ class ReportResponse(BaseModel):
     intervention_id: int
 
     model_config = ConfigDict(from_attributes=True) 
+
+class UpdateRoleRequest(BaseModel):
+    role_id: int
