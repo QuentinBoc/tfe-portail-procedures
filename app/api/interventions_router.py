@@ -1,7 +1,5 @@
 from datetime import datetime, timezone
-
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
 from app.api.schemas import InterventionCreate, InterventionOut, AssignRequest
 from app.core.permissions import require_min_level
 from app.core.security import get_current_user
@@ -11,8 +9,18 @@ from app.models.reports import Report
 from app.models.user import User
 from app.models.intervention import Intervention
 from app.services.notification_service import check_notification, notification_all_users
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from uuid import uuid4
+import os
+from PIL import Image
+from io import BytesIO
+
 
 router = APIRouter(tags=["interventions"])
+
+UPLOAD_DIR = "uploads"
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+MAX_DIMENSION = 1920
 
 @router.post("", status_code=201, response_model=InterventionOut)
 def add_intervention(
@@ -33,6 +41,39 @@ def add_intervention(
     db.refresh(new_intervention)
     notification_all_users(db= db, role_id= 4, message= "Vous avez une nouvelle intervention en attente de validation", intervention_id= new_intervention.id)
     return new_intervention
+
+@router.post("/{intervention_id}/image", response_model=InterventionOut)
+def upload_image(
+    intervention_id: int,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Verifie format et taille puis ajoute une image à une intervention existante."""
+    intervention = (
+        db.query(Intervention)
+        .filter(Intervention.id == intervention_id)
+        .first()
+    )
+    if intervention is None:
+        raise HTTPException(status_code=404, detail="Intervention inexistante")
+    if intervention.created_by != current_user.id:
+        raise HTTPException(status_code=403, detail="L'intervention ne vous appartient pas")
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=415, detail="Type de fichier non-supporté")
+    contents = file.file.read()
+    image = Image.open(BytesIO(contents))
+    image.thumbnail((MAX_DIMENSION, MAX_DIMENSION))
+    unique_name = f"{uuid4()}.jpg"  # on force le jpg pour la compression
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    file_path = os.path.join(UPLOAD_DIR, unique_name)
+    image = image.convert("RGB")
+    image.save(file_path, format="JPEG", quality=80) 
+    intervention.image_path = file_path
+    db.commit()
+    db.refresh(intervention)
+    return intervention
 
 @router.get("/mine", response_model=list[InterventionOut])
 def get_my_interventions(

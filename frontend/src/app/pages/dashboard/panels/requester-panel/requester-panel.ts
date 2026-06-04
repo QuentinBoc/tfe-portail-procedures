@@ -6,6 +6,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReportService } from './../../../../services/report.service';
 import { InterventionReport } from '../../../interfaces/report.model';
+import { switchMap, of } from 'rxjs';
 
 
 @Component({
@@ -23,6 +24,7 @@ export class RequesterPanel implements OnInit {
   selectedIntervention: Intervention | null = null;
   form;
   reports: Record<number, InterventionReport[]> = {}
+  selectedFile: File | null = null;
 
   constructor(
     private interventionService: InterventionService,
@@ -54,22 +56,31 @@ export class RequesterPanel implements OnInit {
     this.loadInterventions()
   }
 
-  /** Valide et envoie la création d'une nouvelle intervention */
+/** Crée l'intervention puis, si une photo est sélectionnée, l'uploade via switchMap */
   onSubmit(): void {
-    if (this.form.invalid) return;
-    const data = this.form.value;
-    this.interventionService.create(data).subscribe({
-      next: () => {
-        this.closeModal();
-        this.loadInterventions();
-        this.form.reset()
-      },
-      error: (err) => {
-        console.error('Erreur', err)
-      }
-    })
+  if (this.form.invalid) return;
+  const data = this.form.value;
 
-  }
+  this.interventionService.create(data).pipe(
+    switchMap((intervention: any) => {
+      if (this.selectedFile) {
+        return this.interventionService.uploadImage(intervention.id, this.selectedFile);
+      }
+      return of(intervention);
+    })
+  ).subscribe({
+    next: () => {
+      this.closeModal();
+      this.loadInterventions();
+      this.form.reset();
+      this.selectedFile = null;
+    },
+    error: (err) => {
+      console.error('Erreur', err);
+    }
+  });
+}
+
 
   /** Ouvre le formulaire de création */
   openModal(): void {
@@ -150,6 +161,13 @@ export class RequesterPanel implements OnInit {
       this.hideIntervention(id);
     }
   }
+
+  onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    this.selectedFile = input.files[0];
+  }
+}
 
   
 }

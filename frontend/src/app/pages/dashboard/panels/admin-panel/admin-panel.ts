@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../../services/user.service';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { User, UserCreateAdmin } from '../../../interfaces/users.model';
 import { FormsModule } from '@angular/forms';
 
@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [DatePipe, FormsModule, CommonModule],
+  imports: [ FormsModule, CommonModule],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.css',
 })

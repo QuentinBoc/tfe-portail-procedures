@@ -27,3 +27,4 @@ class Intervention(Base):
     rejected_by = Column(Integer, ForeignKey("users.id", name="fk_interventions_rejected_by"), nullable=True)
     rejected_at = Column(DateTime, nullable=True)
     is_hidden = Column(Boolean, nullable=False, default=False, server_default="0")
+    image_path = Column(String, nullable=True)

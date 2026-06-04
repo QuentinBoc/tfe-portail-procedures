@@ -17,6 +17,7 @@ export interface Intervention {
     rejected_at: string | null
     closed_by: number | null
     closed_at: string | null
+    image_path?: string
 }
 
 

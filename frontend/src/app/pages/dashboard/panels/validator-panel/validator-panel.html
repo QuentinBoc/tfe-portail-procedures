@@ -59,6 +59,13 @@
                   <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description</span>
                   <span class="text-[#3E5153]">{{ intervention.description }}</span>
                 </div>
+                @if (intervention.image_path) {
+                <div class="col-span-2 border-b border-[#9D9E81]/30 pb-3">
+                  <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Photo</span>
+                  <img [src]="'http://127.0.0.1:8000/' + intervention.image_path" alt="Photo de l'intervention"
+                    class="mt-2 rounded-lg max-h-64 object-contain" />
+                </div>
+                }
 
                 <div class="col-span-2 flex gap-3 mt-1.5 justify-center">
                   <button type="button" (click)="validate(intervention.id); $event.stopPropagation()"
@@ -168,6 +175,13 @@
                   {{ getStatusClass(intervention.status).label }}
                 </span>
               </div>
+              @if (intervention.image_path) {
+                <div class="col-span-2 border-b border-[#9D9E81]/30 pb-3">
+                  <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Photo</span>
+                  <img [src]="'http://127.0.0.1:8000/' + intervention.image_path" alt="Photo de l'intervention"
+                    class="mt-2 rounded-lg max-h-64 object-contain" />
+                </div>
+                }
 
               <div class="col-span-2 pt-2">
                 <span class="text-xs text-[#628276]">Progression</span>

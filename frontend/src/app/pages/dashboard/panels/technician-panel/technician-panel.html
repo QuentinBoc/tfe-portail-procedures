@@ -39,6 +39,13 @@
                         </span>
 
                     </div>
+                    @if (intervention.image_path) {
+                    <div class="col-span-2 border-b border-[#9D9E81]/30 pb-3">
+                        <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Photo</span>
+                        <img [src]="'http://127.0.0.1:8000/' + intervention.image_path" alt="Photo de l'intervention"
+                            class="mt-2 rounded-lg max-h-64 object-contain" />
+                    </div>
+                    }
                     <div class="col-span-2 flex gap-3 mt-1.5 justify-center">
                         <button
                             class="px-3 py-1.5 bg-[#e6f4ea] text-[#1e7e34] rounded-md text-[11px] font-semibold uppercase tracking-wider hover:bg-[#d4ebd9] transition shadow-sm border border-[#c3e6cb]"
@@ -107,6 +114,13 @@
                                 {{ getStatusClass(intervention.status).label }}
                             </span>
                         </div>
+                        @if (intervention.image_path) {
+                        <div class="col-span-2 border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Photo</span>
+                            <img [src]="'http://127.0.0.1:8000/' + intervention.image_path"
+                                alt="Photo de l'intervention" class="mt-2 rounded-lg max-h-64 object-contain" />
+                        </div>
+                        }
                         <div class="col-span-2 flex gap-3 mt-1.5 justify-center">
                             <button type="button"
                                 (click)="onReportForm(intervention.id, 'closure'); $event.stopPropagation()"
@@ -150,7 +164,8 @@
                                             Annuler
                                         </button>
                                         <button type="button" (click)="submitReport()" [disabled]="!reportDescription"
-                                            class="btn-alert disabled:opacity-40 disabled:cursor-not-allowed">
+                                            [ngClass]="reportType === 'closure' ? 'btn-success' : 'btn-alert'"
+                                            class="disabled:opacity-40 disabled:cursor-not-allowed">
                                             {{ reportType === 'closure' ? 'Clôturer l\'intervention' : 'Signaler le
                                             problème' }}
                                         </button>
@@ -181,12 +196,12 @@
             @for (intervention of interventionsClosed; track intervention.id) {
             <div class="border rounded-xl p-4 transition-colors cursor-pointer shadow-sm"
                 [ngClass]="getCardClass(intervention.id)" (click)="toggleDetails(intervention.id)">
-                <div class="grid grid-cols-2 items-center text-center">
+                <div class="grid grid-cols-2 items-center text-center border-b border-[#9D9E81]/30 pb-3">
                     <p class="text-[#3E5153] font-semibold mb-1">{{ intervention.title }}</p>
                     <p class="text-sm text-[#628276]">{{ intervention.created_at | date:'dd/MM/yyyy' }}</p>
                 </div>
-            </div>
-            <div class="grid transition-all duration-300" [ngClass]="getExpandClass(intervention.id)">
+            
+            <div class="grid transition-all duration-300 pt-2" [ngClass]="getExpandClass(intervention.id)">
                 <div class="w-full overflow-hidden  rounded-lg shadow-sm">
                     <div class="bg-[#3E5153] px-4 py-3.5 flex items-center border-b border-[#416F6F]">
                         <h3 class="text-sm font-medium text-[#FFD195]">Détails de l'intervention</h3>
@@ -219,6 +234,13 @@
                                 class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Description:</span>
                             <span class="font-semibold text-[#3E5153]">{{ intervention.description }}</span>
                         </div>
+                        @if (intervention.image_path) {
+                        <div class="col-span-2 border-b border-[#9D9E81]/30 pb-3">
+                            <span class="text-[#628276] text-xs font-medium uppercase tracking-wider mb-1">Photo</span>
+                            <img [src]="'http://127.0.0.1:8000/' + intervention.image_path"
+                                alt="Photo de l'intervention" class="mt-2 rounded-lg max-h-64 object-contain" />
+                        </div>
+                        }
                         <div class="col-span-2 flex justify-end mt-2">
                             @if (intervention.status === 'CLOSED' || intervention.status === 'REJECTED') {
                             <button type="button"
@@ -230,6 +252,7 @@
                         </div>
 
                     </div>
+                </div>
                 </div>
             </div>
             }

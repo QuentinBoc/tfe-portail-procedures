@@ -76,6 +76,12 @@ export class InterventionService {
 
   reactivateIntervention(id: number) {
     return this.http.patch<Intervention>(`${this.apiURL}/${id}/reactivate`, {});
-}
+  }
+
+  uploadImage(id: number, file: File): Observable<Intervention> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<Intervention>(`${this.apiURL}/${id}/image`, formData);
+  }
 
 }

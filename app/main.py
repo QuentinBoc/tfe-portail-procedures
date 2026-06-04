@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.core.middleware import ReadOnlyMiddleware
 from app.api import api_router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 
 def create_app():
@@ -25,6 +26,7 @@ def create_app():
 
     # API
     app.include_router(api_router, prefix="/api/v1")
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
     # Page HTML
     @app.get("/")

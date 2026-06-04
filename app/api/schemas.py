@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, EmailStr, ConfigDict, Field, field_validator
 from app.models.enums import ReportType
 
@@ -36,6 +37,7 @@ class InterventionOut(BaseModel):
     rejected_at: datetime | None
     closed_by: int | None
     closed_at: datetime | None
+    image_path: Optional[str] = None
     
     
     model_config = ConfigDict(from_attributes=True)
