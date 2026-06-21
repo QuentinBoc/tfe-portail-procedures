@@ -30,3 +30,7 @@ Thumbs.db
 laughing-vaughan-*
 
 **/.claude/
+
+# Fichiers uploadés par les utilisateurs
+uploads/*
+!uploads/.gitkeep
