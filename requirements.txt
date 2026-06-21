@@ -33,3 +33,4 @@ uvloop==0.22.1
 watchfiles==1.1.1
 websockets==16.0
 Pillow==12.2.0
+python-multipart==0.0.32
